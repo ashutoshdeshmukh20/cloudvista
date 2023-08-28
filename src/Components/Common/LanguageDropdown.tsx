@@ -15,6 +15,7 @@ import languages from "../../common/languages";
 
 //img
 import usflag from "assets/images/flags/us.jpg";
+import indiaflag from "assets/images/flags/india.jpg";
 
 const LanguageDropdown = (props: any) => {
   // Declare a new state variable, which we'll call "menu"
@@ -42,7 +43,7 @@ const LanguageDropdown = (props: any) => {
       <Dropdown isOpen={menu} toggle={toggle} className="d-inline-block language-switch">
         <DropdownToggle className="btn header-item " tag="button">
           <img
-            src={get(languages, `${selectedLang}.flag`) || usflag}
+            src={get(languages, `${selectedLang}.flag`) || indiaflag}
             alt="skote"
             height="16"
           />

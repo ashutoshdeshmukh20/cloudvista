@@ -26,9 +26,11 @@ interface TableContainerProps {
   isGlobalFilter?: any;
   isAddOptions?: any;
   isAddUserList?: any;
+  isAddClientList?: any;
   isAddInvoiceList?: any;
   handleOrderClicks?: any;
   handleUserClick?: any;
+  handleClientClick?: any;
   handleCustomerClick?: any;
   isAddCustList?: any;
   customPageSize: any;
@@ -109,8 +111,10 @@ const TableContainer: any = ({
   isJobListGlobalFilter,
   isAddOptions,
   isAddUserList,
+  isAddClientList,
   handleOrderClicks,
   handleUserClick,
+  handleClientClick,
   handleCustomerClick,
   isAddCustList,
   customPageSize,
@@ -220,6 +224,21 @@ const TableContainer: any = ({
               >
                 <i className="mdi mdi-plus-circle-outline me-1" />
                 Create New User
+              </Button>
+            </div>
+          </Col>
+        )}
+        {isAddClientList && (
+          <Col sm="7">
+            <div className="text-sm-end">
+              <Button
+                type="button"
+                color="primary"
+                className="btn mb-2 me-2"
+                onClick={handleClientClick}
+              >
+                <i className="mdi mdi-plus-circle-outline me-1" />
+                Create New Client
               </Button>
             </div>
           </Col>

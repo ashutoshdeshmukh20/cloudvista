@@ -3,8 +3,13 @@ import germany from "../assets/images/flags/germany.jpg";
 import italy from "../assets/images/flags/italy.jpg";
 import russia from "../assets/images/flags/russia.jpg";
 import usflag from "../assets/images/flags/us.jpg"
+import indiaflag from "../assets/images/flags/india.jpg"
 
 const languages : Object = {
+    en:{
+        label:"English",
+        flag :indiaflag
+    },
     sp :{
         label : "Spanish",
         flag :spain
@@ -21,10 +26,9 @@ const languages : Object = {
         label:"Russia",
         flag :russia
     },
-    en:{
-        label:"English",
-        flag :usflag
-    }
+    
+    
+
 }
 
 export default languages

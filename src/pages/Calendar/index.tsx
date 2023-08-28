@@ -278,7 +278,7 @@ const Calender = (props: any) => {
           {/* Render Breadcrumb */}
           <Breadcrumbs title="Calendar" breadcrumbItem="Full Calendar" />
           <Row>
-         <Col className="col-12">
+            <Col className="col-12">
               <Row>
                 <Col lg={3}>
                   <Card>

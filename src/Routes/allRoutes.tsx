@@ -170,6 +170,12 @@ import ForgotPassword from "pages/Authentication/ForgotPassword";
 import SignUp from "pages/Authentication/Register"
 import FormValidations from "pages/Forms/FormValidations";
 
+// Pages Clients
+import Clients from "../pages/Clients/index";
+import Aws from "../pages/Aws/index";
+import Veritas from "../pages/Veritas/index";
+import Checkpoint from "../pages/Checkpoint/index";
+
 const authProtectedRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
   { path: "/dashboard-saas", component: <DashboardSaas /> },
@@ -320,6 +326,14 @@ const authProtectedRoutes = [
   { path: "/profile", component: <UserProfile /> },
 
   { path: "/", exact: true, component: <Navigate to="/dashboard" /> },
+
+  //calendar
+  { path: "/clients", component: <Clients /> },
+
+  //OEM
+  { path: "/aws", component: <Aws /> },
+  { path: "/veritas", component: <Veritas /> },
+  { path: "/checkpoint", component: <Checkpoint /> },
 ];
 
 const publicRoutes = [

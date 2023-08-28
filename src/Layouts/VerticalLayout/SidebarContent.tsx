@@ -141,7 +141,9 @@ const SidebarContent = (props: any) => {
         <div id="sidebar-menu">
           <ul className="metismenu list-unstyled" id="side-menu">
             <li className="menu-title">{props.t("Menu")} </li>
-            <li>
+            
+            
+            {/* <li>
               <Link to="/#" className="has-arrow">
                 <i className="bx bx-home-circle"></i>
                 <span>{props.t("Dashboards")}</span>
@@ -166,11 +168,18 @@ const SidebarContent = (props: any) => {
                   </Link>
                 </li>
               </ul>
+            </li> */}
+
+            <li>
+              <Link to="/dashboard">
+                <i className="bx bx-home-circle"></i>
+                <span>{props.t("Dashboard")}</span>
+              </Link>
             </li>
 
             <li>
-              <Link to="/#">
-                <i className="bx bx-briefcase-alt-2"></i>
+              <Link to="/clients">
+                <i className="bx bxs-contact"></i>
                 <span>{props.t("Clients")}</span>
               </Link>
             </li>
@@ -182,16 +191,13 @@ const SidebarContent = (props: any) => {
               </Link>
               <ul className="sub-menu">
                 <li>
-                  <Link to="/projects-grid">{props.t("AWS")}</Link>
+                  <Link to="/aws">{props.t("AWS")}</Link>
                 </li>
                 <li>
-                  <Link to="/projects-list">{props.t("Veritas")}</Link>
+                  <Link to="/veritas">{props.t("Veritas")}</Link>
                 </li>
                 <li>
-                  <Link to="/projects-overview">{props.t("Checkpoint")}</Link>
-                </li>
-                <li>
-                  <Link to="/projects-create">{props.t("Create New")}</Link>
+                  <Link to="/checkpoint">{props.t("Checkpoint")}</Link>
                 </li>
               </ul>
             </li>

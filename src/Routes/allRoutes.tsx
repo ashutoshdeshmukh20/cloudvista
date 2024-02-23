@@ -175,6 +175,9 @@ import Clients from "../pages/Clients/index";
 import Aws from "../pages/Aws/index";
 import Veritas from "../pages/Veritas/index";
 import Checkpoint from "../pages/Checkpoint/index";
+import AddClient from "pages/Clients/AddClient";
+import ClientData from "pages/Clients/ClientData";
+import SubOrg from "pages/Clients/SubOrg";
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
@@ -329,6 +332,10 @@ const authProtectedRoutes = [
 
   //calendar
   { path: "/clients", component: <Clients /> },
+  {path:"/addclientpage", component:<AddClient/>},
+  {path:"/clientdata",component:<ClientData/>},
+  {path:"/addsuborg",component:<SubOrg/>},
+  {},
 
   //OEM
   { path: "/aws", component: <Aws /> },

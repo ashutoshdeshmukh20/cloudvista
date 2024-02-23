@@ -6,6 +6,22 @@ const Email = (cell: any) => {
     return cell.value ? cell.value : '';
 };
 
+const Org = (cell: any) => {
+    return (
+        <>
+            {map(cell.value, (org: any, index: any) => index < 2 && (
+                <Link to="#" className="badge badge-soft-primary font-size-11 m-1" key={"_skill_" + cell.value + index}> {org} </Link>
+            )
+            )}
+            {size(cell.value) > 2 && (
+                <Link to="#" className="badge badge-soft-primary font-size-11 m-1" key={"_skill_" + cell.value} > {size(cell.value) - 1} + more  </Link>
+            )}
+        </>
+    )
+             
+};
+
+
 const Mobile = (cell: any) => {
     return cell.value ? cell.value : '';
 };
@@ -46,4 +62,4 @@ const Img = (cell: any) => {
     );
 };
 
-export { Email, Services, Projects, Img, Mobile };
+export { Email, Services, Projects, Img, Mobile,Org };

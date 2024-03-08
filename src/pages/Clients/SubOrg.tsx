@@ -11,9 +11,12 @@ import {
   CardBody,
   Col,
 } from "reactstrap";
+import { Link,useNavigate } from "react-router-dom";
 import Breadcrumbs from "Components/Common/Breadcrumb";
 
 const SubOrg = (props: any) => {
+
+
   return (
     <>
       <React.Fragment>
@@ -75,7 +78,14 @@ const SubOrg = (props: any) => {
                           placeholder="Enter permissions/roles"
                         />
                       </FormGroup>
-                      <Button color="primary">Submit</Button>
+                      <div className="d-flex justify-content-between align-items-center">
+                        <Link to="/clientdata">
+                         <i className="bx bx-left-arrow-alt"></i> Back To Clients Data 
+                        </Link>
+                        <Button color="primary" type="submit">
+                          Submit
+                        </Button>
+                      </div>
                     </Form>
                   </CardBody>
                 </Card>

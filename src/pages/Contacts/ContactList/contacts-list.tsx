@@ -19,7 +19,7 @@ import DeleteModal from "../../../Components/Common/DeleteModal";
 import {
   getUsers as onGetUsers,
   deleteUsers as onDeleteUsers,
-  addNewUser as onAddNewUser,
+  addNewUser as onAddNewUser, 
   updateUser as onUpdateUser
 }
   from "../../../slices/contacts/thunk"

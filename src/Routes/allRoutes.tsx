@@ -178,6 +178,9 @@ import Checkpoint from "../pages/Checkpoint/index";
 import AddClient from "pages/Clients/AddClient";
 import ClientData from "pages/Clients/ClientData";
 import SubOrg from "pages/Clients/SubOrg";
+import Org from "pages/Clients/Org";
+import AddSubClient from "pages/Clients/AddSubClient";
+import SubClientsData from "pages/Clients/SubClientsData";
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
@@ -335,7 +338,9 @@ const authProtectedRoutes = [
   {path:"/addclientpage", component:<AddClient/>},
   {path:"/clientdata",component:<ClientData/>},
   {path:"/addsuborg",component:<SubOrg/>},
-  {},
+  {path:"/org",component:<Org/>},
+  {path:"/addsub-client",component:<AddSubClient/>},
+  {path:"/subclientData",component:<SubClientsData/>},
 
   //OEM
   { path: "/aws", component: <Aws /> },

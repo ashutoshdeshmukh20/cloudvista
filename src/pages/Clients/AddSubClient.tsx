@@ -222,7 +222,7 @@ const AddSubClient = () => {
                                         {formik1.errors.address && <div className="text-danger">{formik1.errors.address}</div>}
                                     </FormGroup>
                                     <div className="d-flex justify-content-end">
-                                        <Button color="primary" type="submit">Next</Button>
+                                        <Button color="primary" type="submit">Next   </Button>
                                     </div>
                                 </Form>
                             </TabPane>

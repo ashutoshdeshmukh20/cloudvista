@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // default
-axios.defaults.baseURL = "";
+axios.defaults.baseURL = " ";
 
 // content type
 axios.defaults.headers.post["Content-Type"] = "application/json";

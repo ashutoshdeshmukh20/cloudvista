@@ -19,15 +19,15 @@ const AddClient = () => {
 
   const validationSchema1 = Yup.object().shape({
     companyName: Yup.string().required('Company Name is required'),
-    companyEmail: Yup.string().email('Invalid email').required('Email is required'),
+    companyEmail: Yup.string().email().matches(/^(?!.*@[^,]*,)/).required("Please Enter Your Email"),
     address: Yup.string().required('Address is required'),
-    contact: Yup.string().required('Contact No. is required'),
+    contact: Yup.string().matches(/^[0-9]{10}$/).required("Please Enter Your Phone No"),
   });
 
   const validationSchema2 = Yup.object().shape({
     name: Yup.string().required('Name is required'),
-    email: Yup.string().email('Invalid email').required('Email is required'),
-    mobile: Yup.string().required('Mobile is required'),
+    email: Yup.string().email().matches(/^(?!.*@[^,]*,)/).required("Please Enter Your Email"),
+    mobile: Yup.string().matches(/^[0-9]{10}$/).required("Please Enter Your Phone No"),
     designation: Yup.string().required('Designation is required'),
   });
 

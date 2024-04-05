@@ -1,4 +1,7 @@
-import React, { useCallback, useMemo, useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { get } from "../../Utils/api_connection";
+import TableContainer from "Components/Common/TableContainer";
+import Breadcrumbs from "Components/Common/Breadcrumb";
 import {
   Card,
   CardBody,
@@ -7,820 +10,733 @@ import {
   Container,
   Row,
   UncontrolledTooltip,
-  Dropdown,
   DropdownItem,
   DropdownToggle,
   DropdownMenu,
   UncontrolledDropdown
 } from "reactstrap";
-// Import Breadcrumb
-import Breadcrumbs from "../../Components/Common/Breadcrumb";
-import TableContainer from "Components/Common/TableContainer";
-//import Pagination from "Components/Common/Pagination";
-import { Link, useNavigate } from "react-router-dom";
-import { Email, Services, Mobile, Org, Client } from "./clientlistCol";
-import BarChart from "./barchart";
-
 export const dummyData = [
   {
-      "id": 1,
-      "name": "John Doe",
-      "designation": "CEO",
-      "email": "john.doe@example.com",
-      "mobile": "123-456-7890",
-      "services": ["Consulting", "Marketing"],
-      "CompanyName": "AWS",
-      "org": ["AWS"],
-      "subOrgs": ["EC2", "S3", "Lambda"],
-      "subClients": [
-          {
-              "id": 1,
-              "name": "Sub Client 1",
-              "email": "subclient1@example.com",
-              "mobile": "111-222-3333",
-              "subDesignation":"Junior Developer"
-          },
-      ],
-      "address": "123 Main Street, City, Country",
-      "companyEmail": "contact@aws.com"
+    "id": 1,
+    "name": "John Doe",
+    "designation": "CEO",
+    "email": "john.doe@example.com",
+    "mobile": "123-456-7890",
+    "services": ["Consulting", "Marketing"],
+    "CompanyName": "AWS",
+    "org": ["AWS"],
+    "subOrgs": ["EC2", "S3", "Lambda"],
+    "subClients": [
+      {
+        "id": 1,
+        "name": "Sub Client 1",
+        "email": "subclient1@example.com",
+        "mobile": "111-222-3333",
+        "subDesignation": "Junior Developer"
+      },
+    ],
+    "address": "123 Main Street, City, Country",
+    "companyEmail": "contact@aws.com"
   },
   {
-      "id": 2,
-      "name": "Jane Smith",
-      "designation": "CFO",
-      "email": "jane.smith@example.com",
-      "mobile": "987-654-3210",
-      "services": ["Accounting", "Financial Planning"],
-      "CompanyName": "Azure",
-      "org": ["Azure"],
-      "subOrgs": ["Virtual Machines", "Blob Storage", "Azure Functions"],
-      "subClients": [
-          {
-              "id": 2,
-              "name": "Sub Client 2",
-              "email": "subclient2@example.com",
-              "mobile": "222-333-4444",
-              "subDesignation":"Senior Developer"
-          }
-      ],
-      "address": "456 Oak Avenue, City, Country",
-      "companyEmail": "contact@azure.com"
+    "id": 2,
+    "name": "Jane Smith",
+    "designation": "CFO",
+    "email": "jane.smith@example.com",
+    "mobile": "987-654-3210",
+    "services": ["Accounting", "Financial Planning"],
+    "CompanyName": "Azure",
+    "org": ["Azure"],
+    "subOrgs": ["Virtual Machines", "Blob Storage", "Azure Functions"],
+    "subClients": [
+      {
+        "id": 2,
+        "name": "Sub Client 2",
+        "email": "subclient2@example.com",
+        "mobile": "222-333-4444",
+        "subDesignation": "Senior Developer"
+      }
+    ],
+    "address": "456 Oak Avenue, City, Country",
+    "companyEmail": "contact@azure.com"
   },
   {
-      "id": 3,
-      "name": "Bob Johnson",
-      "designation": "COO",
-      "email": "bob.johnson@example.com",
-      "mobile": "555-123-4567",
-      "services": ["Operations", "Supply Chain"],
-      "CompanyName": "Google Cloud",
-      "org": ["Google Cloud"],
-      "subOrgs": ["Compute Engine", "Cloud Storage", "Cloud Functions"],
-      "subClients": [
-          {
-              "id": 3,
-              "name": "Sub Client 3",
-              "email": "subclient3@example.com",
-              "mobile": "333-444-5555",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "789 Pine Street, City, Country",
-      "companyEmail": "contact@googlecloud.com"
+    "id": 3,
+    "name": "Bob Johnson",
+    "designation": "COO",
+    "email": "bob.johnson@example.com",
+    "mobile": "555-123-4567",
+    "services": ["Operations", "Supply Chain"],
+    "CompanyName": "Google Cloud",
+    "org": ["Google Cloud"],
+    "subOrgs": ["Compute Engine", "Cloud Storage", "Cloud Functions"],
+    "subClients": [
+      {
+        "id": 3,
+        "name": "Sub Client 3",
+        "email": "subclient3@example.com",
+        "mobile": "333-444-5555",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "789 Pine Street, City, Country",
+    "companyEmail": "contact@googlecloud.com"
   },
   {
-      "id": 4,
-      "name": "Alice Adams",
-      "designation": "CMO",
-      "email": "alice.adams@example.com",
-      "mobile": "999-888-7777",
-      "services": ["Marketing", "Public Relations"],
-      "CompanyName": "IBM Cloud",
-      "org": ["IBM Cloud"],
-      "subOrgs": ["Virtual Private Cloud", "Object Storage", "Watson AI"],
-      "subClients": [
-          {
-              "id": 4,
-              "name": "Sub Client 4",
-              "email": "subclient4@example.com",
-              "mobile": "444-555-6666",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "321 Elm Street, City, Country",
-      "companyEmail": "contact@ibmcloud.com"
+    "id": 4,
+    "name": "Alice Adams",
+    "designation": "CMO",
+    "email": "alice.adams@example.com",
+    "mobile": "999-888-7777",
+    "services": ["Marketing", "Public Relations"],
+    "CompanyName": "IBM Cloud",
+    "org": ["IBM Cloud"],
+    "subOrgs": ["Virtual Private Cloud", "Object Storage", "Watson AI"],
+    "subClients": [
+      {
+        "id": 4,
+        "name": "Sub Client 4",
+        "email": "subclient4@example.com",
+        "mobile": "444-555-6666",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "321 Elm Street, City, Country",
+    "companyEmail": "contact@ibmcloud.com"
   },
   {
-      "id": 5,
-      "name": "Bob Brown",
-      "designation": "CTO",
-      "email": "Bob.Brown@example.com",
-      "mobile": "111-222-3333",
-      "services": ["Development", "Product Management"],
-      "CompanyName": "Alibaba Cloud",
-      "org": ["Alibaba Cloud"],
-      "subOrgs": ["Elastic Compute Service", "Object Storage Service", "Function Compute"],
-      "subClients": [
-          {
-              "id": 5,
-              "name": "Sub Client 5",
-              "email": "subclient5@example.com",
-              "mobile": "555-666-7777",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "567 Maple Avenue, City, Country",
-      "companyEmail": "contact@alibabacloud.com"
+    "id": 5,
+    "name": "Bob Brown",
+    "designation": "CTO",
+    "email": "Bob.Brown@example.com",
+    "mobile": "111-222-3333",
+    "services": ["Development", "Product Management"],
+    "CompanyName": "Alibaba Cloud",
+    "org": ["Alibaba Cloud"],
+    "subOrgs": ["Elastic Compute Service", "Object Storage Service", "Function Compute"],
+    "subClients": [
+      {
+        "id": 5,
+        "name": "Sub Client 5",
+        "email": "subclient5@example.com",
+        "mobile": "555-666-7777",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "567 Maple Avenue, City, Country",
+    "companyEmail": "contact@alibabacloud.com"
   },
   {
-      "id": 6,
-      "name": "Charlie Campbell",
-      "designation": "CTO",
-      "email": "charlie.c@example.com",
-      "mobile": "444-555-6666",
-      "services": ["IT", "Network Security"],
-      "CompanyName": "Oracle Cloud",
-      "org": ["Oracle Cloud"],
-      "subOrgs": ["Compute", "Database", "Networking"],
-      "subClients": [
-          {
-              "id": 6,
-              "name": "Sub Client 6",
-              "email": "subclient6@example.com",
-              "mobile": "666-777-8888",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "876 Pine Street, City, Country",
-      "companyEmail": "contact@oraclecloud.com"
+    "id": 6,
+    "name": "Charlie Campbell",
+    "designation": "CTO",
+    "email": "charlie.c@example.com",
+    "mobile": "444-555-6666",
+    "services": ["IT", "Network Security"],
+    "CompanyName": "Oracle Cloud",
+    "org": ["Oracle Cloud"],
+    "subOrgs": ["Compute", "Database", "Networking"],
+    "subClients": [
+      {
+        "id": 6,
+        "name": "Sub Client 6",
+        "email": "subclient6@example.com",
+        "mobile": "666-777-8888",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "876 Pine Street, City, Country",
+    "companyEmail": "contact@oraclecloud.com"
   },
   {
-      "id": 7,
-      "name": "David Davis",
-      "designation": "CIO",
-      "email": "David.d@example.com",
-      "mobile": "777-888-9999",
-      "services": ["Cloud Computing", "Data Analytics"],
-      "CompanyName": "DigitalOcean",
-      "org": ["DigitalOcean"],
-      "subOrgs": ["Droplets", "Block Storage", "Kubernetes"],
-      "subClients": [
-          {
-              "id": 7,
-              "name": "Sub Client 7",
-              "email": "subclient7@example.com",
-              "mobile": "777-777-7777",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "987 Oak Avenue, City, Country",
-      "companyEmail": "contact@digitalocean.com"
+    "id": 7,
+    "name": "David Davis",
+    "designation": "CIO",
+    "email": "David.d@example.com",
+    "mobile": "777-888-9999",
+    "services": ["Cloud Computing", "Data Analytics"],
+    "CompanyName": "DigitalOcean",
+    "org": ["DigitalOcean"],
+    "subOrgs": ["Droplets", "Block Storage", "Kubernetes"],
+    "subClients": [
+      {
+        "id": 7,
+        "name": "Sub Client 7",
+        "email": "subclient7@example.com",
+        "mobile": "777-777-7777",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "987 Oak Avenue, City, Country",
+    "companyEmail": "contact@digitalocean.com"
   },
   {
-      "id": 8,
-      "name": "Eva Evans",
-      "designation": "CMO",
-      "email": "eva.evans@example.com",
-      "mobile": "111-222-3333",
-      "services": ["Marketing", "Brand Management"],
-      "CompanyName": "Salesforce",
-      "org": ["Salesforce"],
-      "subOrgs": ["Sales Cloud", "Service Cloud", "Marketing Cloud"],
-      "subClients": [
-          {
-              "id": 8,
-              "name": "Sub Client 8",
-              "email": "subclient8@example.com",
-              "mobile": "888-888-8888",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "654 Main Street, City, Country",
-      "companyEmail": "contact@salesforce.com"
+    "id": 8,
+    "name": "Eva Evans",
+    "designation": "CMO",
+    "email": "eva.evans@example.com",
+    "mobile": "111-222-3333",
+    "services": ["Marketing", "Brand Management"],
+    "CompanyName": "Salesforce",
+    "org": ["Salesforce"],
+    "subOrgs": ["Sales Cloud", "Service Cloud", "Marketing Cloud"],
+    "subClients": [
+      {
+        "id": 8,
+        "name": "Sub Client 8",
+        "email": "subclient8@example.com",
+        "mobile": "888-888-8888",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "654 Main Street, City, Country",
+    "companyEmail": "contact@salesforce.com"
   },
   {
-      "id": 9,
-      "name": "Frank Fisher",
-      "designation": "CFO",
-      "email": "frank.fisher@example.com",
-      "mobile": "444-555-6666",
-      "services": ["Financial Planning", "Accounting"],
-      "CompanyName": "VMware",
-      "org": ["VMware"],
-      "subOrgs": ["vSphere", "vSAN", "NSX"],
-      "subClients": [
-          {
-              "id": 9,
-              "name": "Sub Client 9",
-              "email": "subclient9@example.com",
-              "mobile": "999-999-9999",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "234 Cedar Street, City, Country",
-      "companyEmail": "contact@vmware.com"
+    "id": 9,
+    "name": "Frank Fisher",
+    "designation": "CFO",
+    "email": "frank.fisher@example.com",
+    "mobile": "444-555-6666",
+    "services": ["Financial Planning", "Accounting"],
+    "CompanyName": "VMware",
+    "org": ["VMware"],
+    "subOrgs": ["vSphere", "vSAN", "NSX"],
+    "subClients": [
+      {
+        "id": 9,
+        "name": "Sub Client 9",
+        "email": "subclient9@example.com",
+        "mobile": "999-999-9999",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "234 Cedar Street, City, Country",
+    "companyEmail": "contact@vmware.com"
   },
   {
-      "id": 10,
-      "name": "Grace Green",
-      "designation": "CTO",
-      "email": "grace.green@example.com",
-      "mobile": "777-888-9999",
-      "services": ["Software Development", "Quality Assurance"],
-      "CompanyName": "Red Hat",
-      "org": ["Red Hat"],
-      "subOrgs": ["OpenShift", "Ansible", "JBoss"],
-      "subClients": [
-          {
-              "id": 10,
-              "name": "Sub Client 10",
-              "email": "subclient10@example.com",
-              "mobile": "101-010-1010",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "876 Maple Avenue, City, Country",
-      "companyEmail": "contact@redhat.com"
+    "id": 10,
+    "name": "Grace Green",
+    "designation": "CTO",
+    "email": "grace.green@example.com",
+    "mobile": "777-888-9999",
+    "services": ["Software Development", "Quality Assurance"],
+    "CompanyName": "Red Hat",
+    "org": ["Red Hat"],
+    "subOrgs": ["OpenShift", "Ansible", "JBoss"],
+    "subClients": [
+      {
+        "id": 10,
+        "name": "Sub Client 10",
+        "email": "subclient10@example.com",
+        "mobile": "101-010-1010",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "876 Maple Avenue, City, Country",
+    "companyEmail": "contact@redhat.com"
   },
   {
-      "id": 11,
-      "name": "Henry Hill",
-      "designation": "CIO",
-      "email": "henry.hill@example.com",
-      "mobile": "111-222-3333",
-      "services": ["IT Management", "Infrastructure Services"],
-      "CompanyName": "HP",
-      "org": ["HP"],
-      "subOrgs": ["HP ProLiant", "HP Storage", "HP Networking"],
-      "subClients": [
-          {
-              "id": 11,
-              "name": "Sub Client 11",
-              "email": "subclient11@example.com",
-              "mobile": "111-111-1111",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "543 Cedar Street, City, Country",
-      "companyEmail": "contact@hp.com"
+    "id": 11,
+    "name": "Henry Hill",
+    "designation": "CIO",
+    "email": "henry.hill@example.com",
+    "mobile": "111-222-3333",
+    "services": ["IT Management", "Infrastructure Services"],
+    "CompanyName": "HP",
+    "org": ["HP"],
+    "subOrgs": ["HP ProLiant", "HP Storage", "HP Networking"],
+    "subClients": [
+      {
+        "id": 11,
+        "name": "Sub Client 11",
+        "email": "subclient11@example.com",
+        "mobile": "111-111-1111",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "543 Cedar Street, City, Country",
+    "companyEmail": "contact@hp.com"
   },
   {
-      "id": 12,
-      "name": "Isabel Inman",
-      "designation": "CMO",
-      "email": "isabel.inman@example.com",
-      "mobile": "444-555-6666",
-      "services": ["Marketing Strategy", "Advertising"],
-      "CompanyName": "Cisco",
-      "org": ["Cisco"],
-      "subOrgs": ["Networking", "Security", "Collaboration"],
-      "subClients": [
-          {
-              "id": 12,
-              "name": "Sub Client 12",
-              "email": "subclient12@example.com",
-              "mobile": "121-212-1212",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "123 Elm Street, City, Country",
-      "companyEmail": "contact@cisco.com"
+    "id": 12,
+    "name": "Isabel Inman",
+    "designation": "CMO",
+    "email": "isabel.inman@example.com",
+    "mobile": "444-555-6666",
+    "services": ["Marketing Strategy", "Advertising"],
+    "CompanyName": "Cisco",
+    "org": ["Cisco"],
+    "subOrgs": ["Networking", "Security", "Collaboration"],
+    "subClients": [
+      {
+        "id": 12,
+        "name": "Sub Client 12",
+        "email": "subclient12@example.com",
+        "mobile": "121-212-1212",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "123 Elm Street, City, Country",
+    "companyEmail": "contact@cisco.com"
   },
   {
-      "id": 13,
-      "name": "Jack Jackson",
-      "designation": "CFO",
-      "email": "jack.jackson@example.com",
-      "mobile": "777-888-9999",
-      "services": ["Financial Analysis", "Risk Management"],
-      "CompanyName": "Dell",
-      "org": ["Dell"],
-      "subOrgs": ["Dell EMC", "Dell Technologies", "Dell Networking"],
-      "subClients": [
-          {
-              "id": 13,
-              "name": "Sub Client 13",
-              "email": "subclient13@example.com",
-              "mobile": "131-313-1313",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "876 Pine Street, City, Country",
-      "companyEmail": "contact@dell.com"
+    "id": 13,
+    "name": "Jack Jackson",
+    "designation": "CFO",
+    "email": "jack.jackson@example.com",
+    "mobile": "777-888-9999",
+    "services": ["Financial Analysis", "Risk Management"],
+    "CompanyName": "Dell",
+    "org": ["Dell"],
+    "subOrgs": ["Dell EMC", "Dell Technologies", "Dell Networking"],
+    "subClients": [
+      {
+        "id": 13,
+        "name": "Sub Client 13",
+        "email": "subclient13@example.com",
+        "mobile": "131-313-1313",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "876 Pine Street, City, Country",
+    "companyEmail": "contact@dell.com"
   },
   {
-      "id": 14,
-      "name": "Karen King",
-      "designation": "CEO",
-      "email": "karen.king@example.com",
-      "mobile": "111-222-3333",
-      "services": ["Leadership", "Management"],
-      "CompanyName": "Adobe",
-      "org": ["Adobe"],
-      "subOrgs": ["Creative Cloud", "Document Cloud", "Experience Cloud"],
-      "subClients": [
-          {
-              "id": 14,
-              "name": "Sub Client 14",
-              "email": "subclient14@example.com",
-              "mobile": "141-414-1414",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "567 Oak Avenue, City, Country",
-      "companyEmail": "contact@adobe.com"
+    "id": 14,
+    "name": "Karen King",
+    "designation": "CEO",
+    "email": "karen.king@example.com",
+    "mobile": "111-222-3333",
+    "services": ["Leadership", "Management"],
+    "CompanyName": "Adobe",
+    "org": ["Adobe"],
+    "subOrgs": ["Creative Cloud", "Document Cloud", "Experience Cloud"],
+    "subClients": [
+      {
+        "id": 14,
+        "name": "Sub Client 14",
+        "email": "subclient14@example.com",
+        "mobile": "141-414-1414",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "567 Oak Avenue, City, Country",
+    "companyEmail": "contact@adobe.com"
   },
   {
-      "id": 15,
-      "name": "Larry Lambert",
-      "designation": "CTO",
-      "email": "larry.lambert@example.com",
-      "mobile": "444-555-6666",
-      "services": ["Technology", "Innovation"],
-      "CompanyName": "NVIDIA",
-      "org": ["NVIDIA"],
-      "subOrgs": ["Graphics", "Data Center", "Autonomous Machines"],
-      "subClients": [
-          {
-              "id": 15,
-              "name": "Sub Client 15",
-              "email": "subclient15@example.com",
-              "mobile": "151-515-1515",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "543 Maple Avenue, City, Country",
-      "companyEmail": "contact@nvidia.com"
+    "id": 15,
+    "name": "Larry Lambert",
+    "designation": "CTO",
+    "email": "larry.lambert@example.com",
+    "mobile": "444-555-6666",
+    "services": ["Technology", "Innovation"],
+    "CompanyName": "NVIDIA",
+    "org": ["NVIDIA"],
+    "subOrgs": ["Graphics", "Data Center", "Autonomous Machines"],
+    "subClients": [
+      {
+        "id": 15,
+        "name": "Sub Client 15",
+        "email": "subclient15@example.com",
+        "mobile": "151-515-1515",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "543 Maple Avenue, City, Country",
+    "companyEmail": "contact@nvidia.com"
   },
   {
-      "id": 16,
-      "name": "Monica Morris",
-      "designation": "CFO",
-      "email": "monica.morris@example.com",
-      "mobile": "777-888-9999",
-      "services": ["Finance", "Investments"],
-      "CompanyName": "Tesla",
-      "org": ["Tesla"],
-      "subOrgs": ["Electric Vehicles", "Energy Generation", "Energy Storage"],
-      "subClients": [
-          {
-              "id": 16,
-              "name": "Sub Client 16",
-              "email": "subclient16@example.com",
-              "mobile": "161-616-1616",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "765 Cedar Street, City, Country",
-      "companyEmail": "contact@tesla.com"
+    "id": 16,
+    "name": "Monica Morris",
+    "designation": "CFO",
+    "email": "monica.morris@example.com",
+    "mobile": "777-888-9999",
+    "services": ["Finance", "Investments"],
+    "CompanyName": "Tesla",
+    "org": ["Tesla"],
+    "subOrgs": ["Electric Vehicles", "Energy Generation", "Energy Storage"],
+    "subClients": [
+      {
+        "id": 16,
+        "name": "Sub Client 16",
+        "email": "subclient16@example.com",
+        "mobile": "161-616-1616",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "765 Cedar Street, City, Country",
+    "companyEmail": "contact@tesla.com"
   },
   {
-      "id": 17,
-      "name": "Nathan Newman",
-      "designation": "CMO",
-      "email": "nathan.newman@example.com",
-      "mobile": "111-222-3333",
-      "services": ["Marketing", "Advertising"],
-      "CompanyName": "Netflix",
-      "org": ["Netflix"],
-      "subOrgs": ["Content Creation", "Content Distribution", "Content Delivery"],
-      "subClients": [
-          {
-              "id": 17,
-              "name": "Sub Client 17",
-              "email": "subclient17@example.com",
-              "mobile": "171-717-1717",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "765 Pine Street, City, Country",
-      "companyEmail": "contact@netflix.com"
+    "id": 17,
+    "name": "Nathan Newman",
+    "designation": "CMO",
+    "email": "nathan.newman@example.com",
+    "mobile": "111-222-3333",
+    "services": ["Marketing", "Advertising"],
+    "CompanyName": "Netflix",
+    "org": ["Netflix"],
+    "subOrgs": ["Content Creation", "Content Distribution", "Content Delivery"],
+    "subClients": [
+      {
+        "id": 17,
+        "name": "Sub Client 17",
+        "email": "subclient17@example.com",
+        "mobile": "171-717-1717",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "765 Pine Street, City, Country",
+    "companyEmail": "contact@netflix.com"
   },
   {
-      "id": 18,
-      "name": "Olivia Olsen",
-      "designation": "CIO",
-      "email": "olivia.olsen@example.com",
-      "mobile": "444-555-6666",
-      "services": ["IT", "Information Security"],
-      "CompanyName": "Intel",
-      "org": ["Intel"],
-      "subOrgs": ["Processors", "Motherboards", "Graphics Cards"],
-      "subClients": [
-          {
-              "id": 18,
-              "name": "Sub Client 18",
-              "email": "subclient18@example.com",
-              "mobile": "181-818-1818",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "654 Maple Avenue, City, Country",
-      "companyEmail": "contact@intel.com"
+    "id": 18,
+    "name": "Olivia Olsen",
+    "designation": "CIO",
+    "email": "olivia.olsen@example.com",
+    "mobile": "444-555-6666",
+    "services": ["IT", "Information Security"],
+    "CompanyName": "Intel",
+    "org": ["Intel"],
+    "subOrgs": ["Processors", "Motherboards", "Graphics Cards"],
+    "subClients": [
+      {
+        "id": 18,
+        "name": "Sub Client 18",
+        "email": "subclient18@example.com",
+        "mobile": "181-818-1818",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "654 Maple Avenue, City, Country",
+    "companyEmail": "contact@intel.com"
   },
   {
-      "id": 19,
-      "name": "Peter Peterson",
-      "designation": "CMO",
-      "email": "peter.peterson@example.com",
-      "mobile": "777-888-9999",
-      "services": ["Marketing", "Brand Management"],
-      "CompanyName": "Facebook",
-      "org": ["Facebook"],
-      "subOrgs": ["Facebook App", "Instagram", "WhatsApp"],
-      "subClients": [
-          {
-              "id": 19,
-              "name": "Sub Client 19",
-              "email": "subclient19@example.com",
-              "mobile": "191-919-1919",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "876 Oak Avenue, City, Country",
-      "companyEmail": "contact@facebook.com"
+    "id": 19,
+    "name": "Peter Peterson",
+    "designation": "CMO",
+    "email": "peter.peterson@example.com",
+    "mobile": "777-888-9999",
+    "services": ["Marketing", "Brand Management"],
+    "CompanyName": "Facebook",
+    "org": ["Facebook"],
+    "subOrgs": ["Facebook App", "Instagram", "WhatsApp"],
+    "subClients": [
+      {
+        "id": 19,
+        "name": "Sub Client 19",
+        "email": "subclient19@example.com",
+        "mobile": "191-919-1919",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "876 Oak Avenue, City, Country",
+    "companyEmail": "contact@facebook.com"
   },
   {
-      "id": 20,
-      "name": "Quinn Quinn",
-      "designation": "CFO",
-      "email": "quinn.quinn@example.com",
-      "mobile": "111-222-3333",
-      "services": ["Financial Management", "Budgeting"],
-      "CompanyName": "Amazon",
-      "org": ["Amazon"],
-      "subOrgs": ["Amazon Web Services", "Amazon Prime", "Amazon Marketplace"],
-      "subClients": [
-          {
-              "id": 20,
-              "name": "Sub Client 20",
-              "email": "subclient20@example.com",
-              "mobile": "202-020-2020",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "987 Cedar Street, City, Country",
-      "companyEmail": "contact@amazon.com"
+    "id": 20,
+    "name": "Quinn Quinn",
+    "designation": "CFO",
+    "email": "quinn.quinn@example.com",
+    "mobile": "111-222-3333",
+    "services": ["Financial Management", "Budgeting"],
+    "CompanyName": "Amazon",
+    "org": ["Amazon"],
+    "subOrgs": ["Amazon Web Services", "Amazon Prime", "Amazon Marketplace"],
+    "subClients": [
+      {
+        "id": 20,
+        "name": "Sub Client 20",
+        "email": "subclient20@example.com",
+        "mobile": "202-020-2020",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "987 Cedar Street, City, Country",
+    "companyEmail": "contact@amazon.com"
   },
   {
-      "id": 21,
-      "name": "Rachel Rice",
-      "designation": "CEO",
-      "email": "rachel.rice@example.com",
-      "mobile": "444-555-6666",
-      "services": ["Leadership", "Strategy"],
-      "CompanyName": "Microsoft",
-      "org": ["Microsoft"],
-      "subOrgs": ["Windows", "Office", "Azure"],
-      "subClients": [
-          {
-              "id": 21,
-              "name": "Sub Client 21",
-              "email": "subclient21@example.com",
-              "mobile": "212-121-2121",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "876 Elm Street, City, Country",
-      "companyEmail": "contact@microsoft.com"
+    "id": 21,
+    "name": "Rachel Rice",
+    "designation": "CEO",
+    "email": "rachel.rice@example.com",
+    "mobile": "444-555-6666",
+    "services": ["Leadership", "Strategy"],
+    "CompanyName": "Microsoft",
+    "org": ["Microsoft"],
+    "subOrgs": ["Windows", "Office", "Azure"],
+    "subClients": [
+      {
+        "id": 21,
+        "name": "Sub Client 21",
+        "email": "subclient21@example.com",
+        "mobile": "212-121-2121",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "876 Elm Street, City, Country",
+    "companyEmail": "contact@microsoft.com"
   },
   {
-      "id": 22,
-      "name": "Steve Stevens",
-      "designation": "CTO",
-      "email": "steve.stevens@example.com",
-      "mobile": "777-888-9999",
-      "services": ["Technology", "Innovation"],
-      "CompanyName": "Apple",
-      "org": ["Apple"],
-      "subOrgs": ["iPhone", "Mac", "iPad"],
-      "subClients": [
-          {
-              "id": 22,
-              "name": "Sub Client 22",
-              "email": "subclient22@example.com",
-              "mobile": "222-222-2222",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "123 Pine Street, City, Country",
-      "companyEmail": "contact@apple.com"
+    "id": 22,
+    "name": "Steve Stevens",
+    "designation": "CTO",
+    "email": "steve.stevens@example.com",
+    "mobile": "777-888-9999",
+    "services": ["Technology", "Innovation"],
+    "CompanyName": "Apple",
+    "org": ["Apple"],
+    "subOrgs": ["iPhone", "Mac", "iPad"],
+    "subClients": [
+      {
+        "id": 22,
+        "name": "Sub Client 22",
+        "email": "subclient22@example.com",
+        "mobile": "222-222-2222",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "123 Pine Street, City, Country",
+    "companyEmail": "contact@apple.com"
   },
   {
-      "id": 23,
-      "name": "Tina Taylor",
-      "designation": "CIO",
-      "email": "tina.taylor@example.com",
-      "mobile": "111-222-3333",
-      "services": ["IT Management", "Security"],
-      "CompanyName": "Samsung",
-      "org": ["Samsung"],
-      "subOrgs": ["Mobile", "Electronics", "Semiconductors"],
-      "subClients": [
-          {
-              "id": 23,
-              "name": "Sub Client 23",
-              "email": "subclient23@example.com",
-              "mobile": "232-323-2323",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "876 Maple Avenue, City, Country",
-      "companyEmail": "contact@samsung.com"
+    "id": 23,
+    "name": "Tina Taylor",
+    "designation": "CIO",
+    "email": "tina.taylor@example.com",
+    "mobile": "111-222-3333",
+    "services": ["IT Management", "Security"],
+    "CompanyName": "Samsung",
+    "org": ["Samsung"],
+    "subOrgs": ["Mobile", "Electronics", "Semiconductors"],
+    "subClients": [
+      {
+        "id": 23,
+        "name": "Sub Client 23",
+        "email": "subclient23@example.com",
+        "mobile": "232-323-2323",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "876 Maple Avenue, City, Country",
+    "companyEmail": "contact@samsung.com"
   },
   {
-      "id": 24,
-      "name": "Ursula Underwood",
-      "designation": "CMO",
-      "email": "ursula.underwood@example.com",
-      "mobile": "444-555-6666",
-      "services": ["Marketing", "Branding"],
-      "CompanyName": "Sony",
-      "org": ["Sony"],
-      "subOrgs": ["PlayStation", "Electronics", "Movies"],
-      "subClients": [
-          {
-              "id": 24,
-              "name": "Sub Client 24",
-              "email": "subclient24@example.com",
-              "mobile": "242-424-2424",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "543 Elm Street, City, Country",
-      "companyEmail": "contact@sony.com"
+    "id": 24,
+    "name": "Ursula Underwood",
+    "designation": "CMO",
+    "email": "ursula.underwood@example.com",
+    "mobile": "444-555-6666",
+    "services": ["Marketing", "Branding"],
+    "CompanyName": "Sony",
+    "org": ["Sony"],
+    "subOrgs": ["PlayStation", "Electronics", "Movies"],
+    "subClients": [
+      {
+        "id": 24,
+        "name": "Sub Client 24",
+        "email": "subclient24@example.com",
+        "mobile": "242-424-2424",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "543 Elm Street, City, Country",
+    "companyEmail": "contact@sony.com"
   },
   {
-      "id": 25,
-      "name": "Vincent Vaughn",
-      "designation": "CFO",
-      "email": "vincent.vaughn@example.com",
-      "mobile": "777-888-9999",
-      "services": ["Finance", "Accounting"],
-      "CompanyName": "Uber",
-      "org": ["Uber"],
-      "subOrgs": ["Uber Eats", "Uber Ride", "Uber Freight"],
-      "subClients": [
-          {
-              "id": 25,
-              "name": "Sub Client 25",
-              "email": "subclient25@example.com",
-              "mobile": "252-525-2525",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "765 Maple Avenue, City, Country",
-      "companyEmail": "contact@uber.com"
+    "id": 25,
+    "name": "Vincent Vaughn",
+    "designation": "CFO",
+    "email": "vincent.vaughn@example.com",
+    "mobile": "777-888-9999",
+    "services": ["Finance", "Accounting"],
+    "CompanyName": "Uber",
+    "org": ["Uber"],
+    "subOrgs": ["Uber Eats", "Uber Ride", "Uber Freight"],
+    "subClients": [
+      {
+        "id": 25,
+        "name": "Sub Client 25",
+        "email": "subclient25@example.com",
+        "mobile": "252-525-2525",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "765 Maple Avenue, City, Country",
+    "companyEmail": "contact@uber.com"
   },
   {
-      "id": 26,
-      "name": "Wendy Wilson",
-      "designation": "CTO",
-      "email": "wendy.wilson@example.com",
-      "mobile": "111-222-3333",
-      "services": ["Technology", "Innovation"],
-      "CompanyName": "Netflix",
-      "org": ["Netflix"],
-      "subOrgs": ["Content Creation", "Content Distribution", "Content Delivery"],
-      "subClients": [
-          {
-              "id": 26,
-              "name": "Sub Client 26",
-              "email": "subclient26@example.com",
-              "mobile": "262-626-2626",
-              "subDesignation":"Frontend Developer"
+    "id": 26,
+    "name": "Wendy Wilson",
+    "designation": "CTO",
+    "email": "wendy.wilson@example.com",
+    "mobile": "111-222-3333",
+    "services": ["Technology", "Innovation"],
+    "CompanyName": "Netflix",
+    "org": ["Netflix"],
+    "subOrgs": ["Content Creation", "Content Distribution", "Content Delivery"],
+    "subClients": [
+      {
+        "id": 26,
+        "name": "Sub Client 26",
+        "email": "subclient26@example.com",
+        "mobile": "262-626-2626",
+        "subDesignation": "Frontend Developer"
 
-          }
-      ],
-      "address": "987 Elm Street, City, Country",
-      "companyEmail": "contact@netflix.com"
+      }
+    ],
+    "address": "987 Elm Street, City, Country",
+    "companyEmail": "contact@netflix.com"
   },
   {
-      "id": 27,
-      "name": "Xavier Xavier",
-      "designation": "CIO",
-      "email": "xavier.xavier@example.com",
-      "mobile": "444-555-6666",
-      "services": ["IT Management", "Cybersecurity"],
-      "CompanyName": "Google",
-      "org": ["Google"],
-      "subOrgs": ["Search", "Advertising", "Cloud Computing"],
-      "subClients": [
-          {
-              "id": 27,
-              "name": "Sub Client 27",
-              "email": "subclient27@example.com",
-              "mobile": "272-727-2727",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "876 Cedar Street, City, Country",
-      "companyEmail": "contact@google.com"
+    "id": 27,
+    "name": "Xavier Xavier",
+    "designation": "CIO",
+    "email": "xavier.xavier@example.com",
+    "mobile": "444-555-6666",
+    "services": ["IT Management", "Cybersecurity"],
+    "CompanyName": "Google",
+    "org": ["Google"],
+    "subOrgs": ["Search", "Advertising", "Cloud Computing"],
+    "subClients": [
+      {
+        "id": 27,
+        "name": "Sub Client 27",
+        "email": "subclient27@example.com",
+        "mobile": "272-727-2727",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "876 Cedar Street, City, Country",
+    "companyEmail": "contact@google.com"
   },
   {
-      "id": 28,
-      "name": "Yvonne York",
-      "designation": "CMO",
-      "email": "yvonne.york@example.com",
-      "mobile": "777-888-9999",
-      "services": ["Marketing", "Digital Strategy"],
-      "CompanyName": "Twitter",
-      "org": ["Twitter"],
-      "subOrgs": ["Social Media", "Microblogging", "Advertising"],
-      "subClients": [
-          {
-              "id": 28,
-              "name": "Sub Client 28",
-              "email": "subclient28@example.com",
-              "mobile": "282-828-2828",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "654 Elm Street, City, Country",
-      "companyEmail": "contact@twitter.com"
+    "id": 28,
+    "name": "Yvonne York",
+    "designation": "CMO",
+    "email": "yvonne.york@example.com",
+    "mobile": "777-888-9999",
+    "services": ["Marketing", "Digital Strategy"],
+    "CompanyName": "Twitter",
+    "org": ["Twitter"],
+    "subOrgs": ["Social Media", "Microblogging", "Advertising"],
+    "subClients": [
+      {
+        "id": 28,
+        "name": "Sub Client 28",
+        "email": "subclient28@example.com",
+        "mobile": "282-828-2828",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "654 Elm Street, City, Country",
+    "companyEmail": "contact@twitter.com"
   },
   {
-      "id": 29,
-      "name": "Zack Zimmerman",
-      "designation": "CTO",
-      "email": "zack.zimmerman@example.com",
-      "mobile": "111-222-3333",
-      "services": ["Technology", "Innovation"],
-      "CompanyName": "LinkedIn",
-      "org": ["LinkedIn"],
-      "subOrgs": ["Professional Network", "Recruitment", "Learning"],
-      "subClients": [
-          {
-              "id": 29,
-              "name": "Sub Client 29",
-              "email": "subclient29@example.com",
-              "mobile": "292-929-2929",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "543 Pine Street, City, Country",
-      "companyEmail": "contact@linkedin.com"
+    "id": 29,
+    "name": "Zack Zimmerman",
+    "designation": "CTO",
+    "email": "zack.zimmerman@example.com",
+    "mobile": "111-222-3333",
+    "services": ["Technology", "Innovation"],
+    "CompanyName": "LinkedIn",
+    "org": ["LinkedIn"],
+    "subOrgs": ["Professional Network", "Recruitment", "Learning"],
+    "subClients": [
+      {
+        "id": 29,
+        "name": "Sub Client 29",
+        "email": "subclient29@example.com",
+        "mobile": "292-929-2929",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "543 Pine Street, City, Country",
+    "companyEmail": "contact@linkedin.com"
   },
   {
-      "id": 30,
-      "name": "Willie Welch",
-      "designation": "CIO",
-      "email": "willie.welch@example.com",
-      "mobile": "444-555-6666",
-      "services": ["IT Management", "Cybersecurity"],
-      "CompanyName": "Snapchat",
-      "org": ["Snapchat"],
-      "subOrgs": ["Snapchat App", "Spectacles", "Bitmoji"],
-      "subClients": [
-          {
-              "id": 30,
-              "name": "Sub Client 30",
-              "email": "subclient30@example.com",
-              "mobile": "303-030-3030",
-              "subDesignation":"Frontend Developer"
-          }
-      ],
-      "address": "876 Maple Avenue, City, Country",
-      "companyEmail": "contact@snapchat.com"
+    "id": 30,
+    "name": "Willie Welch",
+    "designation": "CIO",
+    "email": "willie.welch@example.com",
+    "mobile": "444-555-6666",
+    "services": ["IT Management", "Cybersecurity"],
+    "CompanyName": "Snapchat",
+    "org": ["Snapchat"],
+    "subOrgs": ["Snapchat App", "Spectacles", "Bitmoji"],
+    "subClients": [
+      {
+        "id": 30,
+        "name": "Sub Client 30",
+        "email": "subclient30@example.com",
+        "mobile": "303-030-3030",
+        "subDesignation": "Frontend Developer"
+      }
+    ],
+    "address": "876 Maple Avenue, City, Country",
+    "companyEmail": "contact@snapchat.com"
   }
 ];
 
+
 function Clients(props: any) {
-  const [clientData, setClientData] = useState<{ name: string; email: string; phone: string; designation: string; }[]>([]);
-  //const [filteredClients, setFilteredClients] = useState(dummyData);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    // Parse URL parameters to get client data
-    const queryParams = new URLSearchParams(window.location.search);
-    const name = queryParams.get("name");
-    const email = queryParams.get("email");
-    const phone = queryParams.get("phone");
-    const org = queryParams.get("org")
-    const designation = queryParams.get("designation");
-    const subClients = queryParams.get("subClients");
+    fetchData();
+  }, []);
 
-    // Update client data state
-    if (name && email && phone && designation && org && subClients) {
-      setClientData((prevData) => [
-        ...prevData,
-        { name, email, phone, designation, org, subClients }
-      ]);
+  const fetchData = async () => {
+    try {
+      const response = await get('list-clients');
+      setData(response.result);
+    } catch (error) {
+      console.error('Error fetching data:', error);
     }
-  }, []);
-  // Meta title
-  document.title = "Clients";
-  const navigate = useNavigate();
-
-  const [contact, setContact] = useState<any>();
-  const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [DummyData, setDummyData] = useState(dummyData);
-
-  const [pageIndex, setPageIndex] = useState<number>(0); // Current page index
-  const pageSize = 10; // Number of items per page
-
-
-
-
-  const handleAddClientClick = () => {
-    navigate("/addclientpage");
   };
+
   const onClickDelete = (user: any): void => {
-    // Filter out the user to be deleted from the DummyData array
-    const updatedData = DummyData.filter((item: any) => item.id !== user.id);
-    // Update the state with the filtered data
-    setDummyData(updatedData);
-    // Close the modal if necessary
+    const updatedData = data.filter((item: any) => item.id !== user.id);
+    setData(updatedData);
   };
-
-  const handleUserClick = useCallback((clientData: any) => {
-    navigate(`/clientData?org=${encodeURIComponent(clientData.org)}&id=${encodeURIComponent(clientData.id)}`);
-
-
-  }, []);
-
- 
-
 
   const columns = useMemo(
     () => [
-      // column definitions
       {
         Header: "Client ID",
         disableFilters: true,
         filterable: true,
         Filter: false,
-        accessor: (cellProps: any) => (
-          <>
-            <h5 className="font-size-14 mb-1">
-              <Link to="#" className="text-dark">
-                {cellProps.id}
-              </Link>
-            </h5>
-          </>
-        ),
+        accessor: "id"
       },
       {
         Header: "Name",
-        accessor:"CompanyName",
         disableFilters: true,
         filterable: true,
         Filter: false,
-        Cell: (cellProps: any) => {
-          return <Org {...cellProps} />;
-        },
+        accessor: "client_name"
       },
       {
-        Header: "Contact Person",
+        Header: "Address",
+        disableFilters: true,
         filterable: true,
         Filter: false,
-        accessor: (cellProps: any) => {
-          return (
-            <>
-              <h5 className="font-size-14 mb-1">
-                <Link to="#" className="text-dark">
-                  {cellProps.name}
-                </Link>
-              </h5>
-              <p className="text-muted mb-0">{cellProps.designation}</p>
-            </>
-          );
-        },
+        accessor: "address_line_2"
       },
       {
         Header: "Email",
-        accessor: "email",
+        disableFilters: true,
         filterable: true,
         Filter: false,
-        Cell: (cellProps: any) => {
-          return <Email {...cellProps} />;
-        },
+        accessor: "email"
       },
       {
         Header: "Mobile",
-        accessor: "mobile",
+        disableFilters: true,
         filterable: true,
         Filter: false,
-        Cell: (cellProps: any) => {
-          return <Mobile {...cellProps} />;
-        },
-      },
-      {
-        Header: "Services",
-        accessor: "services",
-        filterable: true,
-        Filter: false,
-        Cell: (cellProps: any) => {
-          return <Services {...cellProps} />;
-        },
-      },
-      {
-        Header: "Sub-Clients",
-        accessor:"org",
-        filterable: true,
-        Filter: false,
-        Cell: (cellProps: any) => {
-         return <Client {...cellProps}/>
-        },
+        accessor: "phone_number"
       },
       {
         Header: "Action",
@@ -829,13 +745,9 @@ function Clients(props: any) {
         Cell: (cellProps: any) => {
           return (
             <UncontrolledDropdown>
-              <DropdownToggle tag="a" href="#" className="card-drop"> <i className="mdi mdi-dots-horizontal font-size-18"></i></DropdownToggle>
+              <DropdownToggle tag="a" className="card-drop"> <i className="mdi mdi-dots-horizontal font-size-18"></i></DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
-                <DropdownItem
-                  onClick={() => {
-                      ;
-                    handleUserClick(cellProps.row.original);
-                  }}>
+                <DropdownItem>
                   <i className="mdi mdi-account-details font-size-18 text-success me-1" id="edittooltip"></i> View
                   <UncontrolledTooltip placement="top" target="edittooltip"> View </UncontrolledTooltip>
                 </DropdownItem>
@@ -857,90 +769,24 @@ function Clients(props: any) {
     []
   );
 
-  const paginatedData = useMemo(() => {
-    const startIndex = pageIndex * pageSize;
-    return DummyData.slice(startIndex, startIndex + pageSize);
-  }, [DummyData, pageIndex]);
-
-  const totalPages = useMemo(
-    () => Math.ceil(DummyData.length / pageSize),
-    [DummyData, pageSize]
-  );
-
-  const nextPage = useCallback(() => {
-    setPageIndex((prevIndex) => Math.min(prevIndex + 1, totalPages - 1));
-  }, [totalPages]);
-
-  const previousPage = useCallback(() => {
-    setPageIndex((prevIndex) => Math.max(prevIndex - 1, 0));
-  }, []);
-
   return (
     <React.Fragment>
       <div className="page-content">
         <Container fluid={true}>
           {/* Render Breadcrumb */}
           <Breadcrumbs title="Clients" breadcrumbItem="Clients" />
-          {/* write Html code or structure */}
           <Row>
             <Col lg="12">
               <Card>
-                <CardBody>
-                  <div className="d-flex justify-content-end align-items-center">
-                    <button
-                      className="btn btn-primary"
-                      onClick={handleAddClientClick}
-                    >
-                      <i className="bx bx-user-plus font-size-16 align-middle me-2"></i>{" "}
-                      Add New Client
-                    </button>
-                  </div>
-                  <TableContainer
-                    columns={columns}
-                    data={paginatedData} // Pass paginated data here
-                    customPageSize={pageSize}
-                    tableClass="table-striped display-all" />
-                  {/* Pagination */}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginTop: "10px",
-                    }}
-                  >
-                    <button
-                      onClick={previousPage}
-                      disabled={pageIndex === 0}
-                      className="btn btn-secondary"
-                      style={{ marginRight: "10px" }}
-                    >
-                      Previous
-                    </button>
-                    <span>
-                      Page {pageIndex + 1} of {totalPages}
-                    </span>
-                    <button
-                      onClick={nextPage}
-                      disabled={pageIndex === totalPages - 1}
-                      className="btn btn-secondary margin-right:10px"
-                      style={{ marginLeft: "10px" }}
-                    >
-                      Next
-                    </button>
-                  </div>
-                </CardBody>
+                <CardBody></CardBody>
+                <TableContainer
+                  columns={columns}
+                  data={data} // Pass data here
+                  customPageSize={10}
+                  tableClass="table-striped display-all"
+                />
               </Card>
             </Col>
-            { /* <Col lg="4">
-              <Card>
-                <CardBody>
-                  <CardTitle tag="h4" className="mb-4">
-                    Top Billing Clients - {new Date().getFullYear()}{" "}
-                  </CardTitle>
-                  <BarChart dataColors='["--bs-success"]' />
-                </CardBody>
-              </Card>
-                  </Col>*/}
           </Row>
         </Container>
       </div>

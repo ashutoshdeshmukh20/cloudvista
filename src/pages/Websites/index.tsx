@@ -8,61 +8,10 @@ import { useNavigate } from "react-router-dom";
 import Breadcrumbs from "../../Components/Common/Breadcrumb";
 import TableContainer from "Components/Common/TableContainer";
 import { Link } from "react-router-dom";
-import {get} from "../../Utils/api_connection"
-import { Domain, Newrenew, SSL, Payment_status, AMC, AMC_charges } from "./weblistCol";
-const dummyData = [
-    {
-        "id": 1,
-        "Name": "Example Company",
-        "domain": "example.com",
-        "ssl": true,
-        "newrenewal": "2024-05-01",
-        "payment_status": "Paid",
-        "amc": true,
-        "amccharges": 500
-    },
-    {
-        "id": 2,
-        "Name": "Another Company",
-        "domain": "anothercompany.net",
-        "ssl": false,
-        "newrenewal": "2024-08-15",
-        "payment_status": "Pending",
-        "amc": true,
-        "amccharges": 750
-    },
-    {
-        "id": 3,
-        "Name": "ABC Corp",
-        "domain": "abccorp.org",
-        "ssl": true,
-        "newrenewal": "2024-06-30",
-        "payment_status": "Paid",
-        "amc": false,
-        "amccharges": null
-    },
-    {
-        "id": 4,
-        "Name": "XYZ Ltd",
-        "domain": "xyzltd.com",
-        "ssl": true,
-        "newrenewal": "2024-04-30",
-        "payment_status": "Overdue",
-        "amc": true,
-        "amccharges": 1000
-    },
-    {
-        "id": 5,
-        "Name": "Sample Corp",
-        "domain": "samplecorp.com",
-        "ssl": false,
-        "newrenewal": "2024-09-20",
-        "payment_status": "Pending",
-        "amc": true,
-        "amccharges": 600
-    }
-];
+import { APIClient } from "../../helpers/api_helper";
+import { Domain, Newrenew, SSL, Payment_status, AMC, AMcCharges } from "./weblistCol";
 
+const api = new APIClient();
 
 
 
@@ -82,7 +31,7 @@ const Websites = (props: any) => {
     
       const fetchData = async () => {
         try {
-          const response = await get('list-websites');
+          const response = await api.get('list-websites',undefined);
           setData(response.result);
         } catch (error) {
           console.error('Error fetching data:', error);
@@ -106,7 +55,7 @@ const Websites = (props: any) => {
                         </h5>
                     </>
                 ),
-            },
+            },  
             {
                 Header: "Domain",
                 accessor: "domain",
@@ -158,7 +107,7 @@ const Websites = (props: any) => {
                 filterable: true,
                 Filter: false,
                 Cell: (cellProps: any) => {
-                    return <AMC_charges {...cellProps} />;
+                    return <AMcCharges {...cellProps} />;
                 },
             },
             {
@@ -175,7 +124,7 @@ const Websites = (props: any) => {
                     return (
                         <UncontrolledDropdown>
                             <DropdownToggle tag="a" className="card-drop"> <i className="mdi mdi-dots-horizontal font-size-18"></i></DropdownToggle>
-                            <DropdownMenu className="dropdown-menu-end">
+                            <DropdownMenu className="dropdown-menu-end" style={{ maxHeight: '300px', overflowY: 'auto' }}>
                                 <DropdownItem>
                                     <i className="mdi mdi-account-details font-size-18 text-success me-1" id="edittooltip"></i> Edit
                                     <UncontrolledTooltip placement="top" target="edittooltip"> Edit </UncontrolledTooltip>

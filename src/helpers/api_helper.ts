@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // default
-axios.defaults.baseURL = " ";
+axios.defaults.baseURL = " https://lsvca8n44i.execute-api.ap-south-1.amazonaws.com/Prod";
 
 // content type
 axios.defaults.headers.post["Content-Type"] = "application/json";

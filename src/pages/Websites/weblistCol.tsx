@@ -21,8 +21,8 @@ const Payment_status = (cell: any) => {
 const AMC = (cell: any) => {
     return cell.value ? "Active" : "Inactive";
 };
-const AMC_charges = (cell: any) => {
+const AMcCharges = (cell: any) => {
     return cell.value !== null ? cell.value : 'N/A';
  };
 
-export { Domain, SSL, Newrenew, Payment_status, AMC,AMC_charges };
+export { Domain, SSL, Newrenew, Payment_status, AMC,AMcCharges };

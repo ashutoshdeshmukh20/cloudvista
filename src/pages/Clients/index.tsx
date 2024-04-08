@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { get } from "../../Utils/api_connection";
+import { APIClient } from "../../helpers/api_helper";
 import TableContainer from "Components/Common/TableContainer";
 import Breadcrumbs from "Components/Common/Breadcrumb";
 import {
   Card,
   CardBody,
-  CardTitle,
   Col,
   Container,
   Row,
@@ -679,6 +678,8 @@ export const dummyData = [
   }
 ];
 
+const api = new APIClient();
+
 
 function Clients(props: any) {
   const [data, setData] = useState([]);
@@ -689,7 +690,7 @@ function Clients(props: any) {
 
   const fetchData = async () => {
     try {
-      const response = await get('list-clients');
+      const response = await api.get('list-clients',undefined);
       setData(response.result);
     } catch (error) {
       console.error('Error fetching data:', error);

@@ -1,0 +1,27 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    name: CloudVista
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build
+        run: yarn build
+
+      - name: Copy files to EC2
+        run: scp -r build/* ${{ secrets.INSTANCE_IP }}:/var/www/html/my-react-app/build
+
+      - name: Restart Nginx
+        run: ssh ${{ secrets.INSTANCE_IP }} 'sudo service nginx restart'

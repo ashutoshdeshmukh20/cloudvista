@@ -14,22 +14,20 @@ import {
 import Breadcrumbs from "../../Components/Common/Breadcrumb";
 import { useNavigate, useParams } from "react-router-dom";
 import { APIClient } from "../../helpers/api_helper";
-interface ClientData {
-  client_name: string;
-  address_line_1: string;
-  address_line_2: string;
-  city: string;
-  state: string;
-  country: string;
-  zip_code: string;
-  phone_number: string;
-  email: string;
-  logo: string;
-  currency: number;
-  timezone: string;
-  credit_period: number;
+interface WebsiteData {
+  domain: string;
+  ssl: string;
   created_timestamp: string;
-  tax_number: string;
+  amc: string;
+  amc_charges: number;
+  amc_renewal_period: string;
+  hosting: string;
+  hosting_charges: number;
+  hosting_renewal_period: string;
+  hosting_renewal_date: string;
+  total_charges: number;
+  payment_date: string;
+  payment_status: string;
 }
 
 const api = new APIClient();
@@ -37,16 +35,15 @@ const api = new APIClient();
 const Webdetails = (props: any) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [ClientData, setClientData] = useState<ClientData | null>(null);
-  const [CustomerData, setCustomerData] = useState<any[]>([]);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
+  const [websiteData, setWebsiteData] = useState<WebsiteData | null>(null);
+  const [CustomerData, setCustomerData] = useState<any>([]);
   const [editMode, setEditMode] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (id) {
-          const response = await api.get(`list-clients/${id}`, undefined);
-          setClientData(response.result);
+          const response = await api.get(`list-websites/${id}`, undefined);
+          setWebsiteData(response.result);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -71,30 +68,23 @@ const Webdetails = (props: any) => {
 
   const handleSaveClick = () => {
     setEditMode(!editMode);
-    console.log("Edited data:", ClientData);
+    console.log("Edited data:", websiteData);
   };
 
   const handleCancleClick = () => {
-    navigate("/clients");
+    navigate("/websites");
   };
 
-  const handleCustomerChange = (e: any) => {
-    const selectedId = e.target.value;
-    setSelectedCustomerId(selectedId);
-
-    const selectedClient = CustomerData.find(
-      (customer) => customer.id === selectedId
-    );
-    if (selectedClient) {
-      setClientData(selectedClient);
-    }
+  const handleCustomerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedCustomerId = e.target.value;
+    setCustomerData(selectedCustomerId);
   };
 
   return (
     <React.Fragment>
       <div className="page-content">
         <Container fluid={true}>
-          <Breadcrumbs title="Services" breadcrumbItem="Client Details" />
+          <Breadcrumbs title="Services" breadcrumbItem="Website Details" />
           <Card>
             <CardBody>
               <Form>
@@ -106,7 +96,7 @@ const Webdetails = (props: any) => {
                         type="select"
                         name="customer"
                         id="customer"
-                        defaultValue={selectedCustomerId}
+                        defaultValue={CustomerData}
                         readOnly={!editMode}
                         onChange={handleCustomerChange}
                       >
@@ -121,36 +111,36 @@ const Webdetails = (props: any) => {
                   </Col>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="phone">Phone</Label>
+                      <Label for="domain">Domain</Label>
                       <Input
                         type="text"
-                        name="phone"
-                        id="phone"
-                        defaultValue={ClientData?.phone_number || ""}
+                        name="domain"
+                        id="domain"
+                        defaultValue={ websiteData?.domain || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
                   </Col>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="email">email</Label>
+                      <Label for="ssl">SSL</Label>
                       <Input
                         type="text"
-                        name="email"
-                        id="email"
-                        defaultValue={ClientData?.email || ""}
+                        name="ssl"
+                        id="ssl"
+                        defaultValue={websiteData?.ssl || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
                   </Col>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="reg_date">Registerd Date</Label>
+                      <Label for="amc">Registerd Date</Label>
                       <Input
                         type="text"
-                        name="reg_date"
-                        id="reg_date"
-                        defaultValue={ClientData?.created_timestamp || ""}
+                        name="amc"
+                        id="amc"
+                        defaultValue={websiteData?.created_timestamp || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
@@ -159,48 +149,50 @@ const Webdetails = (props: any) => {
                 <Row>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="address_line_1">Add Line 1</Label>
+                      <Label for="amc">AMC</Label>
                       <Input
                         type="text"
-                        name="address_line_1"
-                        id="address_line_1"
-                        defaultValue={ClientData?.address_line_1 || ""}
+                        name="amc"
+                        id="amc"
+                        defaultValue={websiteData?.amc || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
                   </Col>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="address_line_2">Add Line 2</Label>
+                      <Label for="amcCharges">AMC Charges</Label>
                       <Input
                         type="text"
-                        name="address_line_2"
-                        id="address_line_2"
-                        defaultValue={ClientData?.address_line_2 || ""}
+                        name="amcCharges"
+                        id="amcCharges"
+                        defaultValue={websiteData?.amc_charges || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
                   </Col>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="city">City</Label>
+                      <Label for="amcCharges">AMC Renewal period</Label>
                       <Input
                         type="text"
-                        name="city"
-                        id="city"
-                        defaultValue={ClientData?.city || ""}
+                        name="amc_renewal_period"
+                        id="amc_renewal_period"
+                        defaultValue={websiteData?.amc_renewal_period || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
                   </Col>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="state">State</Label>
+                      <Label for="hostingRenewalPeriod">
+                        AMC Renewal Date
+                      </Label>
                       <Input
                         type="text"
-                        name="state"
-                        id="state"
-                        defaultValue={ClientData?.state || ""}
+                        name="hostingRenewalPeriod"
+                        id="hostingRenewalPeriod"
+                        defaultValue={websiteData?.hosting_renewal_date || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
@@ -209,48 +201,52 @@ const Webdetails = (props: any) => {
                 <Row>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="country">Country</Label>
+                      <Label for="hosting">Hosting with us</Label>
                       <Input
                         type="text"
-                        name="country"
-                        id="country"
-                        defaultValue={ClientData?.country || ""}
+                        name="hosting"
+                        id="hosting"
+                        defaultValue={websiteData?.hosting || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
                   </Col>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="zip_code">zip_code</Label>
+                      <Label for="hostingCharges">Hosting Charges</Label>
                       <Input
                         type="text"
-                        name="zip_code"
-                        id="zip_code"
-                        defaultValue={ClientData?.zip_code || ""}
+                        name="hostingCharges"
+                        id="hostingCharges"
+                        defaultValue={websiteData?.hosting_charges || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
                   </Col>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="currency">Currency</Label>
+                      <Label for="hostingRenewalPeriod">
+                        Hosting Renewal Period
+                      </Label>
                       <Input
                         type="text"
-                        name="currency"
-                        id="currency"
-                        defaultValue={ClientData?.currency || ""}
+                        name="hostingRenewalPeriod"
+                        id="hostingRenewalPeriod"
+                        defaultValue={websiteData?.hosting_renewal_period || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
                   </Col>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="timezone">Timezone</Label>
+                      <Label for="hostingRenewalDate">
+                        Hosting Renewal Date
+                      </Label>
                       <Input
                         type="text"
-                        name="timezone"
-                        id="timezone"
-                        defaultValue={ClientData?.timezone || ""}
+                        name="hostingRenewalDate"
+                        id="hostingRenewalDate"
+                        defaultValue={websiteData?.hosting_renewal_date || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
@@ -259,59 +255,46 @@ const Webdetails = (props: any) => {
                 <Row>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="tax_number">TAX_No.</Label>
+                      <Label for="paymentDate">Payment Date</Label>
                       <Input
                         type="text"
-                        name="tax_number"
-                        id="tax_number"
-                        defaultValue={ClientData?.tax_number || ""}
+                        name="paymentDate"
+                        id="paymentDate"
+                        defaultValue={websiteData?.payment_date || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
                   </Col>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="logo">Logo</Label>
+                      <Label for="totalCharges">Total Charges</Label>
                       <Input
                         type="text"
-                        name="logo"
-                        id="logo"
-                        defaultValue={ClientData?.logo || ""}
+                        name="totalCharges"
+                        id="totalCharges"
+                        defaultValue={websiteData?.total_charges || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
                   </Col>
                   <Col md={3}>
                     <FormGroup>
-                      <Label for="paymentStatus">Credit period</Label>
+                      <Label for="paymentStatus">Payment Status</Label>
                       <Input
                         type="text"
-                        name="credit_period"
-                        id="credit_period"
-                        defaultValue={ClientData?.credit_period || ""}
+                        name="paymentStatus"
+                        id="paymentStatus"
+                        defaultValue={websiteData?.payment_status || ""}
                         readOnly={!editMode}
                       />
                     </FormGroup>
                   </Col>
                 </Row>
                 <Row>
-                  <div className="d-flex justify-content-end">
-                    <Button
-                      color="danger"
-                      type="button"
-                      onClick={handleCancleClick}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      color="primary"
-                      type="button"
-                      className="mx-2"
-                      onClick={handleSaveClick}
-                    >
-                      {editMode ? "Save" : "Edit"}
-                    </Button>
-                  </div>
+                <div className="d-flex justify-content-end">
+                      <Button color="danger" type="button" onClick={handleCancleClick}>Cancel</Button>
+                      <Button color='primary' type='button' className='mx-2' onClick={handleSaveClick}>{editMode ? 'Save' : 'Edit'}</Button>
+                    </div>
                 </Row>
               </Form>
             </CardBody>

@@ -1,365 +1,333 @@
-import React, { useState } from 'react';
-import { Container, Card, CardBody, FormGroup, Label, Input, Button, Row, Col } from "reactstrap";
-import Breadcrumbs from "../../Components/Common/Breadcrumb";
-import { useNavigate } from 'react-router-dom';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-
-
-const NewHost = (props: any) => {
+import React, { useState } from "react";
+import Breadcrumbs from "Components/Common/Breadcrumb";
+import {
+  Container,
+  Card,
+  CardBody,
+  Form,
+  Row,
+  Label,
+  Col,
+  Input,
+  Button,
+} from "reactstrap";
+import { APIClient } from "../../helpers/api_helper";
+import { useNavigate } from "react-router-dom";
+const api = new APIClient();
+const NewHosting = () => {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        clientName: "",
-        websiteDomain: "",
-        ssl: "",
-        hostingWithUs: "",
-        paymentStatus: "",
-        amc: "",
-        amcCharges: 0,
-        registeredDate: "",
-        hostingCharges: 0,
-        totalPayment: "",
-        renewalPeriod: "",
-        nextRenewalDate: "",
-        hostingRenewalPeriod: "",
-        nextHostingRenewalDate: "",
-        paymentDate: ""
-    });
-    const validationSchema = Yup.object().shape({
-        clientName: Yup.string().required('Customer Name is required'),
-        websiteDomain: Yup.string()
-            .required('Website domain is required')
-            .matches(/^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}$/, 'Invalid website domain'),
-        ssl: Yup.string().required('SSL is required'),
-        registeredDate: Yup.string().required('Registered Date is required'),
-        amc: Yup.string().required('AMC is required'),
-        amcCharges: Yup.number().required('AMC Charges is required').min(0, 'AMC Charges must be greater than or equal to 0'),
-        renewalPeriod: Yup.string().required('AMC Renewal Period is required'),
-        hostingWithUs: Yup.string().required('Hosting With Us is required'),
-        hostingCharges: Yup.number().required('Hosting Charges is required').min(0, 'Hosting Charges must be greater than or equal to 0'),
-        hostingRenewalPeriod: Yup.string().required('Hosting Renewal Period is required'),
-        paymentDate: Yup.string().required('Payment Date is required'),
-        totalPayment: Yup.string().required('Total Payment is required'),
-        paymentStatus: Yup.string().required('Payment Status is required'),
-    });
+  const [formData, setFormData] = useState({
+    domain: "",
+    ssl: "",
+    created_timestamp: "",
+    amc: "",
+    amc_charges: 0,
+    amc_renewal_period: "",
+    hosting: "",
+    hosting_charges: 0,
+    hosting_renewal_period: "",
+    hosting_renewal_date: "",
+    total_charges: 0,
+    payment_date: "",
+    payment_status: "",
+  });
 
+//validation schema
 
-    const calculateNextRenewalDate = (renewalPeriod: number, registeredDate: string) => {
-        if (!registeredDate) return ""; // If registered date is not provided, return empty string
-        const currentDate = new Date(registeredDate);
-        const nextRenewalDate = new Date(currentDate.getFullYear() + parseInt(renewalPeriod.toString()), currentDate.getMonth(), currentDate.getDate());
-        return nextRenewalDate.toLocaleDateString();
-    };
-
-    const handleRenewalPeriodChange = (e: { target: { value: any; }; }) => {
-        const { value } = e.target;
-        const nextRenewalDate = value ? calculateNextRenewalDate(parseInt(value), formData.registeredDate) : " ";
-        setFormData({
-            ...formData,
-            renewalPeriod: value,
-            nextRenewalDate: nextRenewalDate
-        });
-    };
-
-    const handleHostingRenewalPeriodChange = (e: { target: { value: any; }; }) => {
-        const { value } = e.target;
-        const nextHostingRenewalDate = value ? calculateNextRenewalDate(parseInt(value), formData.registeredDate) : " ";
-        setFormData({
-            ...formData,
-            hostingRenewalPeriod: value,
-            nextHostingRenewalDate: nextHostingRenewalDate
-        });
-    };
-
-    const handleAMCChargesChange = (e: { target: { value: any; }; }) => {
-        const { value } = e.target;
-        const amcCharges = parseFloat(value);
-        const totalPayment = amcCharges + formData.hostingCharges;
-
-        setFormData({
-            ...formData,
-            amcCharges,
-            totalPayment: totalPayment.toString()
-        });
-    };
-
-    const handleHostingChargesChange = (e: { target: { value: any; }; }) => {
-        const { value } = e.target;
-        const hostingCharges = parseFloat(value);
-        const totalPayment = formData.amcCharges + hostingCharges;
-
-        setFormData({
-            ...formData,
-            hostingCharges,
-            totalPayment: totalPayment.toString()
-        });
-    };
-
-    const handleCancleClick = () => {
-        navigate("/websites");
-    }
-
-    // Function to handle form submission
-    const handleSubmit = (e: any) => {
-        e.preventDefault();
-        console.log(formData);
-        setFormData({
-            clientName: "",
-            websiteDomain: "",
-            ssl: "",
-            hostingWithUs: "",
-            paymentStatus: "",
-            amc: "",
-            amcCharges: 0,
-            registeredDate: "",
-            hostingCharges: 0,
-            totalPayment: "",
-            renewalPeriod: "",
-            nextRenewalDate: "",
-            hostingRenewalPeriod: "",
-            nextHostingRenewalDate: "",
-            paymentDate: ""
-        });
-    };
-
-    return (
-        <React.Fragment>
-            <div className="page-content">
-                <Container fluid={true}>
-                    <Breadcrumbs title="Services" breadcrumbItem="Add New Web Hosting" />
-                    <Card>
-                        <CardBody>
-                            <Formik
-                                initialValues={formData}
-                                validationSchema={validationSchema}
-                                onSubmit={handleSubmit}
-                            >
-                                {formik => (
-                                    <Form onSubmit={formik.handleSubmit}>
-
-                                        <Row>
-                                            <Col md={3}>
-                                                <Label for="clientname">Customer Name</Label>
-                                                <Field
-                                                    type="text"
-                                                    name="clientName"
-                                                    id="clientName"
-                                                    placeholder="Enter name"
-                                                    className={`form-control ${formik.errors.clientName && formik.touched.clientName ? 'is-invalid' : ''}`}
-                                                />
-                                                <ErrorMessage name="clientName" component="div" className="invalid-feedback" />
-                                            </Col>
-                                            <Col md={3}>
-                                                {/* Website Domain */}
-                                                <FormGroup>
-                                                    <Label for="websiteDomain">Website Domain</Label>
-                                                    <Field
-                                                        type="text"
-                                                        name="websiteDomain"
-                                                        id="websiteDomain"
-                                                        placeholder="Enter website domain"
-                                                        className={`form-control ${formik.errors.websiteDomain && formik.touched.websiteDomain ? 'is-invalid' : ''}`}
-                                                    />
-                                                    <ErrorMessage name="websiteDomain" component="div" className="invalid-feedback" />
-
-                                                </FormGroup>
-                                            </Col>
-                                            <Col md={3}>
-                                                {/* SSL */}
-                                                <FormGroup>
-                                                    <Label for="ssl">SSL</Label>
-                                                    <Input type="select" name="ssl" id="ssl" value={formData.ssl} onChange={(e) => setFormData({ ...formData, ssl: e.target.value })}>
-                                                        <option value="">Select</option>
-                                                        <option value="yes">Yes</option>
-                                                        <option value="no">No</option>
-                                                    </Input>
-                                                </FormGroup>
-                                            </Col>
-                                            <Col md={3}>
-                                                <FormGroup>
-                                                    <Label for="registeredDate">Registered Date</Label>
-                                                    <Input type="date" name="registeredDate" id="registeredDate"
-                                                        value={formData.registeredDate} onChange={(e) => setFormData({ ...formData, registeredDate: e.target.value })} />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col md={3}>
-                                                <FormGroup>
-                                                    <Label for="amc">AMC</Label>
-                                                    <Input type="select" name="amc" id="amc" value={formData.amc} onChange={(e) => setFormData({ ...formData, amc: e.target.value })}>
-                                                        <option value="">Select</option>
-                                                        <option value="yes">Yes</option>
-                                                        <option value="no">No</option>
-                                                    </Input>
-                                                </FormGroup>
-                                            </Col>
-                                            <Col md={3}>
-                                                {/* Hosting Charges */}
-                                                <FormGroup>
-                                                    <Label for="amcCharges">AMC Charges</Label>
-                                                    <Input
-                                                        type="number"
-                                                        name="amcCharges"
-                                                        id="amcCharges"
-                                                        placeholder="Enter Amc charges"
-                                                        value={formData.amcCharges}
-                                                        onChange={handleAMCChargesChange}
-                                                        step="0.01"
-                                                        min="0.00"
-                                                    />
-
-                                                </FormGroup>
-                                            </Col>
-                                            <Col md={3}>
-
-                                                <FormGroup>
-                                                    <Label for="renewalPeriod">AMC Renewal Period</Label>
-                                                    <Input
-                                                        type="select"
-                                                        name="renewalPeriod"
-                                                        id="renewalPeriod"
-                                                        value={formData.renewalPeriod}
-                                                        onChange={handleRenewalPeriodChange}
-                                                    >
-                                                        <option value="">Select renewal period</option>
-                                                        <option value="1">1 Year</option>
-                                                        <option value="2">2 Years</option>
-                                                        <option value="3">3 Years</option>
-                                                        <option value="4">4 Years</option>
-                                                        <option value="5">5 Years</option>
-                                                    </Input>
-                                                </FormGroup>
-                                            </Col>
-                                            <Col md={3}>
-                                                <FormGroup>
-                                                    <Label for="nextRenewalDate">Next Renewal Date</Label>
-                                                    <Input
-                                                        type="text"
-                                                        name="nextRenewalDate"
-                                                        id="nextRenewalDate"
-                                                        value={formData.nextRenewalDate}
-                                                        readOnly
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col md={3}>
-                                                {/* Hosting With Us */}
-                                                <FormGroup>
-                                                    <Label for="hostingWithUs">Hosting With Us</Label>
-                                                    <Input type="select" name="hostingWithUs" id="hostingWithUs" value={formData.hostingWithUs} onChange={(e) => setFormData({ ...formData, hostingWithUs: e.target.value })}>
-                                                        <option value="">Select</option>
-                                                        <option value="yes">Yes</option>
-                                                        <option value="no">No</option>
-                                                    </Input>
-                                                </FormGroup>
-                                            </Col>
-                                            <Col md={3}>
-                                                {/* Hosting Charges */}
-                                                <FormGroup>
-                                                    <Label for="hostingCharges">Hosting Charges</Label>
-                                                    <Input
-                                                        type="number"
-                                                        name="hostingCharges"
-                                                        id="hostingCharges"
-                                                        placeholder="Enter hosting charges"
-                                                        value={formData.hostingCharges}
-                                                        onChange={handleHostingChargesChange}
-                                                        step="0.01"
-                                                        min="0.00"
-                                                    />
-
-                                                </FormGroup>
-                                            </Col>
-                                            <Col md={3}>
-                                                <FormGroup>
-                                                    <Label for="hostingRenewalPeriod">Hosting Renewal Period</Label>
-                                                    <Input
-                                                        type="select"
-                                                        name="hostingRenewalPeriod"
-                                                        id="hostingRenewalPeriod"
-                                                        value={formData.hostingRenewalPeriod}
-                                                        onChange={handleHostingRenewalPeriodChange}
-                                                    >
-                                                        <option value="">Select hosting renewal period</option>
-                                                        <option value="1">1 Year</option>
-                                                        <option value="2">2 Years</option>
-                                                        <option value="3">3 Years</option>
-                                                        <option value="4">4 Years</option>
-                                                        <option value="5">5 Years</option>
-                                                    </Input>
-                                                </FormGroup>
-                                            </Col>
-                                            <Col md={3}>
-                                                {/* Hosting Charges */}
-                                                <FormGroup>
-                                                    <Label for="nextHostingRenewalDate"> Next Renewal Date</Label>
-                                                    <Input
-                                                        type="text"
-                                                        name="nextHostingRenewalDate"
-                                                        id="nextHostingRenewalDate"
-                                                        value={formData.nextHostingRenewalDate}
-                                                        readOnly
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <div className="total-payment">
-                                                <Container fluid>
-                                                    <Row>
-                                                        <Col md={3}>
-                                                            <FormGroup>
-                                                                <Label for="paymentDate">Payment Date</Label>
-                                                                <Input type="date" name="paymentDate" id="paymentDate"
-                                                                    value={formData.paymentDate} onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })} />
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col md={3}>
-                                                            <FormGroup>
-                                                                <Label for="totalPayment">Total Payment</Label>
-                                                                <Input
-                                                                    type="text"
-                                                                    name="totalPayment"
-                                                                    id="totalPayment"
-                                                                    value={formData.totalPayment}
-                                                                    readOnly
-                                                                />
-                                                            </FormGroup>
-                                                        </Col>
-                                                        <Col md={3}>
-                                                            <FormGroup>
-                                                                <Label for="paymentStatus">Payment Status</Label>
-                                                                <Input type="select" name="paymentStatus" id="paymentStatus" value={formData.paymentStatus} onChange={(e) => setFormData({ ...formData, paymentStatus: e.target.value })}>
-                                                                    <option value="">Select</option>
-                                                                    <option value="Pending">Pending</option>
-                                                                    <option value="Overdue">Overdue</option>
-                                                                    <option value="Processing">Processing</option>
-                                                                    <option value="Paid">Paid</option>
-                                                                </Input>
-                                                            </FormGroup>
-                                                        </Col>
-                                                    </Row>
-                                                </Container>
-                                            </div>
-                                        </Row>
-                                        <Row>
-                                            <div className="d-flex justify-content-end w-100 mt-3">
-                                                <Button color="primary" onClick={(e) => handleSubmit(e)} className="me-2">ADD</Button>
-                                                <Button color="secondary" onClick={handleCancleClick}>Cancel</Button>
-                                            </div>
-                                        </Row>
-                                    </Form>
-                                )}
-                            </Formik>
-                        </CardBody>
-                    </Card>
-                </Container>
-            </div>
-        </React.Fragment>
-    );
+const calculateNextRenewalDate = (amc_renewal_period: number, created_timestamp: string) => {
+  if (!created_timestamp) return ""; // If registered date is not provided, return empty string
+  const currentDate = new Date(created_timestamp);
+  const nextRenewalDate = new Date(currentDate.getFullYear() + parseInt(amc_renewal_period.toString()), currentDate.getMonth(), currentDate.getDate());
+  return nextRenewalDate.toLocaleDateString();
 };
 
-export default NewHost;
+const handleRenewalPeriodChange = (e: { target: { value: any; }; }) => {
+  const { value } = e.target;
+  const nextRenewalDate = value ? calculateNextRenewalDate(parseInt(value), formData.created_timestamp) : " ";
+  setFormData({
+      ...formData,
+      amc_renewal_period: value,
+      hosting_renewal_date: nextRenewalDate
+  });
+};
+
+const handleHostingRenewalPeriodChange = (e: { target: { value: any; }; }) => {
+  const { value } = e.target;
+  const nextHostingRenewalDate = value ? calculateNextRenewalDate(parseInt(value), formData.created_timestamp) : " ";
+  setFormData({
+      ...formData,
+      hosting_renewal_period: value,
+      hosting_renewal_date: nextHostingRenewalDate
+  });
+};
+
+const handleAMCChargesChange = (e: { target: { value: any; }; }) => {
+  const { value } = e.target;
+  const amcCharges = parseFloat(value);
+  const totalPayment = amcCharges + formData.hosting_charges;
+
+  setFormData({
+      ...formData,
+      amc_charges:amcCharges,
+      total_charges: totalPayment
+  });
+};
+
+const handleHostingChargesChange = (e: { target: { value: any; }; }) => {
+  const { value } = e.target;
+  const hostingCharges = parseFloat(value);
+  const totalPayment = formData.amc_charges + hostingCharges;
+
+  setFormData({
+      ...formData,
+      hosting_charges:hostingCharges,
+      total_charges: totalPayment
+  });
+};
+
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    try {
+      const response = await api.create("add-websites", formData);
+      console.log("Response from server:", response);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+  };
+
+  const handleCancleClick = () => {
+    navigate("/websites");
+}
+
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  return (
+    <React.Fragment>
+      <div className="page-content">
+        <Container fluid={true}>
+          <Breadcrumbs title="Services" breadcrumbItem="Add New Web Hosting" />
+          <Card>
+            <CardBody>
+              <div>
+                <Form onSubmit={handleSubmit}>
+                  <Row>
+                  <Col md={3}>
+                      <Label htmlFor="name">Customer Name:</Label>
+                      <Input
+                        type="text"
+                        id="name"
+                        name="name"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={3}>
+                      <Label htmlFor="domain">Domain:</Label>
+                      <Input
+                        type="text"
+                        id="domain"
+                        name="domain"
+                        value={formData.domain}
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={3}>
+                      <Label htmlFor="ssl">SSL:</Label>
+                      <Input
+                        id="ssl"
+                        type="select"
+                        name="ssl"
+                        value={formData.ssl}
+                        onChange={handleChange}
+                      >
+                        <option value="select">Select</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </Input>
+                    </Col>
+
+                    <Col md={3}>
+                      <Label htmlFor="created_timestamp">Reg Date:</Label>
+                      <Input
+                        type="date"
+                        id="created_timestamp"
+                        name="created_timestamp"
+                        value={formData.created_timestamp}
+                        onChange={handleChange}
+                      />
+                    </Col>
+                  </Row>
+                  <Row className="mt-3">
+                    <Col md={3}>
+                      <Label htmlFor="amc">AMC:</Label>
+                      <Input
+                        id="amc"
+                        type="select"
+                        name="amc"
+                        value={formData.amc}
+                        onChange={handleChange}
+                      >
+                        <option value="select">Select</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </Input>
+                    </Col>
+                    <Col md={3}>
+                      <Label htmlFor="amc_charges">AMC Charges:</Label>
+                      <Input
+                        type="number"
+                        id="amc_charges"
+                        name="amc_charges"
+                        value={formData.amc_charges}
+                        onChange={handleAMCChargesChange}
+                      />
+                    </Col>
+
+                    <Col md={3}>
+                      <Label htmlFor="amc_renewal_period">
+                        AMC Renewal Period:
+                      </Label>
+                      <Input
+                        type="select"
+                        id="amc_renewal_period"
+                        name="amc_renewal_period"
+                        value={formData.amc_renewal_period}
+                        onChange={handleRenewalPeriodChange}
+                      >
+                        <option value="select">Select</option>
+                        <option value="1Yr">1 Yr</option>
+                        <option value="3Yr">3 Yr</option>
+                        <option value="4Yr">4 Yr</option>
+                        <option value="5Yr">5 Yr</option>
+                      </Input>
+                    </Col>
+                    <Col md={3}>
+                      <Label htmlFor="amc_renewal_date">
+                        AMC Renewal Date:
+                      </Label>
+                      <Input
+                        type="text"
+                        id="amc_renewal_date"
+                        name="amc_renewal_date"
+                        value={formData.hosting_renewal_date}
+                        onChange={handleChange}
+                      />
+                    </Col>
+                  </Row>
+                  <Row className="mt-3">
+                    <Col md={3}>
+                      <Label htmlFor="hosting">Hosting:</Label>
+                      <Input
+                        id="hosting"
+                        type="select"
+                        name="hosting"
+                        value={formData.hosting}
+                        onChange={handleChange}
+                      >
+                        <option value="select">Select</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </Input>
+                    </Col>
+                    <Col md={3}>
+                      <Label htmlFor="hosting_charges">Hosting Charges:</Label>
+                      <Input
+                        type="number"
+                        id="hosting_charges"
+                        name="hosting_charges"
+                        value={formData.hosting_charges}
+                        onChange={handleHostingChargesChange}
+                      />
+                    </Col>
+                    <Col md={3}>
+                      <Label htmlFor="hosting_renewal_period">
+                        Hosting Renewal Period:
+                      </Label>
+                      <Input
+                        type="select"
+                        id="hosting_renewal_period"
+                        name="hosting_renewal_period"
+                        value={formData.hosting_renewal_period}
+                        onChange={handleHostingRenewalPeriodChange}
+                      >
+                        <option value="select">Select</option>
+                        <option value="1Yr">1 Yr</option>
+                        <option value="3Yr">3 Yr</option>
+                        <option value="4Yr">4 Yr</option>
+                        <option value="5Yr">5 Yr</option>
+                      </Input>
+                    </Col>
+                    <Col md={3}>
+                      <Label htmlFor="hosting_renewal_date">
+                        Hosting Renewal Date:
+                      </Label>
+                      <Input
+                        type="text"
+                        id="hosting_renewal_date"
+                        name="hosting_renewal_date"
+                        value={formData.hosting_renewal_date}
+                        onChange={handleChange}
+                      />
+                    </Col>
+                  </Row>
+                  <Row className="mt-3">
+                    <Col md={3}>
+                      <Label htmlFor="payment_date">Payment Date:</Label>
+                      <Input
+                        type="date"
+                        id="payment_date"
+                        name="payment_date"
+                        value={formData.payment_date}
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={3}>
+                      <Label htmlFor="total_charges">Total Charges:</Label>
+                      <Input
+                        type="number"
+                        id="total_charges"
+                        name="total_charges"
+                        value={formData.total_charges}
+                        onChange={handleChange}
+                      />
+                    </Col>
+                    <Col md={3}>
+                      <Label htmlFor="payment_status">Payment Status:</Label>
+                      <Input
+                        type="select"
+                        id="payment_status"
+                        name="payment_status"
+                        value={formData.payment_status}
+                        onChange={handleChange}
+                      >
+                        <option value="select">Select</option>
+                        <option value="Unpaid">Unnpaid</option>
+                        <option value="Paid">Paid</option>
+                        <option value="pending">Pending</option>
+                      </Input>
+                    </Col>
+                  </Row>
+                  <Row className="mt-4">
+                    <div className="d-flex justify-content-end w-100 mt-3">
+                      <Button type="submit" color="success" className="me-2">Submit</Button>
+                      <Button type="button" color="danger" onClick={handleCancleClick}>Cancel</Button>
+                    </div>
+                  </Row>
+                </Form>
+              </div>
+            </CardBody>
+          </Card>
+        </Container>
+      </div>
+    </React.Fragment>
+  );
+};
+
+export default NewHosting;

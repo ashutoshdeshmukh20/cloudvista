@@ -1,352 +1,486 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { Country, State, City } from "country-state-city";
 import {
-  Button, Form, FormGroup, Label, Input, Container, Card, CardBody,
-  Nav, NavItem, NavLink, TabContent, TabPane, Col
-} from 'reactstrap';
-import Breadcrumbs from 'Components/Common/Breadcrumb';
-import classnames from 'classnames';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+  Row,
+  Col,
+  Card,
+  CardBody,
+  FormGroup,
+  Button,
+  Label,
+  Input,
+  Container,
+  FormFeedback,
+  Form,
+} from "reactstrap";
+// Formik validation
+import * as Yup from "yup";
+import { useFormik } from "formik";
+import { useNavigate } from "react-router-dom";
+
+//Import Breadcrumb
+import Breadcrumbs from "../../Components/Common/Breadcrumb";
 
 const AddClient = () => {
-  const [activeTab, setActiveTab] = useState('1');
+  const navigate = useNavigate();
+  const handleCancle = () =>{
+    navigate("/clients");
+  }
+  //meta title
+  document.title = "Add Client | CV";
+  const rangeValidation: any = useFormik({
+    enableReinitialize: true,
 
-  const toggleTab = (tab: React.SetStateAction<string>) => {
-    if (activeTab !== tab) {
-      setActiveTab(tab);
-    }
-  };
-
-  const validationSchema1 = Yup.object().shape({
-    companyName: Yup.string().required('Company Name is required'),
-    companyEmail: Yup.string().email().matches(/^(?!.*@[^,]*,)/).required("Please Enter Your Email"),
-    address: Yup.string().required('Address is required'),
-    contact: Yup.string().matches(/^[0-9]{10}$/).required("Please Enter Your Phone No"),
-  });
-
-  const validationSchema2 = Yup.object().shape({
-    name: Yup.string().required('Name is required'),
-    email: Yup.string().email().matches(/^(?!.*@[^,]*,)/).required("Please Enter Your Email"),
-    mobile: Yup.string().matches(/^[0-9]{10}$/).required("Please Enter Your Phone No"),
-    designation: Yup.string().required('Designation is required'),
-  });
-
-  const validationSchema3 = Yup.object().shape({
-    service_4: Yup.boolean(),
-    service_5: Yup.boolean(),
-    service_6: Yup.boolean(),
-    service_7: Yup.boolean(),
-  });
-
-  const validationSchema4 = Yup.object().shape({
-    clientName: Yup.string().required('Client Name is required'),
-    billingAddress: Yup.string().required('Billing Address is required'),
-    creditCardNumber: Yup.string().required('Credit Card Number is required'),
-    expirationDate: Yup.string().required('Expiration Date is required'),
-    cvv: Yup.string().required('CVV is required'),
-    billingAmount: Yup.string().required('Billing Amount is required'),
-    paymentMethod: Yup.string().required('Payment Method is required'),
-  });
-
-  const formik1 = useFormik({
     initialValues: {
-      companyName: '',
-      companyEmail: '',
-      address: '',
-      contact: '',
+      customer_name: "",
+      phone: "",
+      email: "",
+      reg_date: "",
+      address_line_1: "",
+      address_line_2: "",
+      country: "",
+      state: "",
+      city: "",
+      zip_code: "",
+      currency: "",
+      timezone: "",
+      tax_number: "",
+      logo: "",
+      credit_period: "",
     },
-    validationSchema: validationSchema1,
-    onSubmit: (values) => {
-      console.log('Form 1 submitted:', values);
-      setActiveTab('2');
-    },
-  });
-
-  const formik2 = useFormik({
-    initialValues: {
-      name: '',
-      email: '',
-      mobile: '',
-      designation: '',
-    },
-    validationSchema: validationSchema2,
-    onSubmit: (values) => {
-      console.log('Form 2 submitted:', values);
-      setActiveTab('3');
-    },
-  });
-
-  const formik3 = useFormik({
-    initialValues: {
-      service_4: false,
-      service_5: false,
-      service_6: false,
-      service_7: false,
-    },
-    validationSchema: validationSchema3,
-    onSubmit: (values) => {
-      console.log('Form 3 submitted:', values);
-      setActiveTab('4');
-    },
-  });
-
-  const formik4 = useFormik({
-    initialValues: {
-      clientName: '',
-      billingAddress: '',
-      creditCardNumber: '',
-      expirationDate: '',
-      cvv: '',
-      billingAmount: '',
-      paymentMethod: '',
-    },
-    validationSchema: validationSchema4,
-    onSubmit: (values) => {
-      console.log('Form 4 submitted:', values);
-      // Handle final form submission logic here
-    },
+    validationSchema: Yup.object().shape({
+      customer_name: Yup.string()
+        .matches(
+          /^[a-zA-Z\s]+$/,
+          "Name cannot contain special characters or numbers"
+        )
+        .required("Customer Name is required"),
+      phone: Yup.string()
+        .required("Phone is required")
+        .matches(/^[0-9]+$/, "Phone number must contain only numbers")
+        .min(10, "Phone number must be at least 10 digits")
+        .max(10, "Phone number cannot exceed 10 digits"),
+      email: Yup.string()
+        .email("Invalid email address")
+        .required("Email is required")
+        .matches(
+          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+          "Invalid email format"
+        )
+        .max(25, "Email cannot exceed 25 characters"),
+      reg_date: Yup.string().required("Please select a date"),
+      address_line_1: Yup.string().required("Address Line 1 is required"),
+      address_line_2: Yup.string().required("Address Line 2 is required"),
+      city: Yup.string().required("City is required"),
+      state: Yup.string().required("State is required"),
+      country: Yup.string().required("Country is required"),
+      zip_code: Yup.string().required("Zip Code is required"),
+      currency: Yup.string().required("Currency is required"),
+      timezone: Yup.string().required("Timezone is required"),
+      tax_number: Yup.string().required("Tax Number is required"),
+      logo: Yup.string().required("Logo is required"),
+      credit_period: Yup.number().required("Credit Period is required"),
+    }),
+    onSubmit: (values) => console.log(JSON.stringify(values)),
   });
 
   return (
-    <div className="page-content">
-      <Container fluid>
-        <Breadcrumbs title="Clients" breadcrumbItem="Add Client" />
-        <Card>
-          <CardBody>
-            <div className="d-flex justify-content-end mb-3">
-              <Button color="primary" href="/clients">View Clients</Button>
-            </div>
-            <Nav tabs className="nav-tabs-custom nav-justified">
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: activeTab === '1' })}
-                  onClick={() => { toggleTab('1'); }}
-                >
-                  Company Details
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: activeTab === '2' })}
-                  onClick={() => { toggleTab('2'); }}
-                >
-                  Contact Person
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: activeTab === '3' })}
-                  onClick={() => { toggleTab('3'); }}
-                >
-                  Services
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: activeTab === '4' })}
-                  onClick={() => { toggleTab('4'); }}
-                >
-                  Billing
-                </NavLink>
-              </NavItem>
+    <React.Fragment>
+      <div className="page-content">
+        <Container fluid={true}>
+          <Breadcrumbs title="Clients" breadcrumbItem="Add Client" />
+          <Row>
+            <Col>
+              <Card>
+                <CardBody>
+                  <Form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      rangeValidation.handleSubmit();
+                      return false;
+                    }}
+                  >
+                    <Row>
+                      <Col md={3} className="mb-3">
+                        <Label>customer Name :</Label>
+                        <Input
+                          name="customer_name"
+                          label="customer name  "
+                          placeholder="Name"
+                          type="text"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.customer_name || ""}
+                          invalid={
+                            rangeValidation.touched.customer_name &&
+                            rangeValidation.errors.customer_name
+                              ? true
+                              : false
+                          }
+                        />
+                        {rangeValidation.touched.customer_name &&
+                        rangeValidation.errors.customer_name ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.customer_name}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Phone :</Label>
+                        <Input
+                          name="phone"
+                          placeholder="Contact number"
+                          type="text"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.phone || ""}
+                          invalid={
+                            rangeValidation.touched.phone &&
+                            rangeValidation.errors.phone
+                              ? true
+                              : false
+                          }
+                        />
+                        {rangeValidation.touched.phone &&
+                        rangeValidation.errors.phone ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.phone}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Email :</Label>
+                        <Input
+                          name="email"
+                          placeholder="Enter Your valid email"
+                          type="email"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.email || ""}
+                          invalid={
+                            rangeValidation.touched.email &&
+                            rangeValidation.errors.email
+                              ? true
+                              : false
+                          }
+                        />
+                        {rangeValidation.touched.email &&
+                        rangeValidation.errors.email ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.email}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Registered Date :</Label>
+                        <Input
+                          name="reg_date"
+                          placeholder="Select a date"
+                          type="date"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.reg_date || ""}
+                          invalid={
+                            rangeValidation.touched.reg_date &&
+                            rangeValidation.errors.reg_date
+                              ? true
+                              : false
+                          }
+                        />
+                        {rangeValidation.touched.reg_date &&
+                        rangeValidation.errors.reg_date ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.reg_date}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={3} className="mb-3">
+                        <Label>Adress Line 1 :</Label>
+                        <Input
+                          name="address_line_1"
+                          label="Adress Line 1 "
+                          placeholder="First Line Adress"
+                          type="text"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.address_line_1 || ""}
+                          invalid={
+                            rangeValidation.touched.address_line_1 &&
+                            rangeValidation.errors.address_line_1
+                              ? true
+                              : false
+                          }
+                        />
+                        {rangeValidation.touched.address_line_1 &&
+                        rangeValidation.errors.address_line_1 ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.address_line_1}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Adress Line 2 :</Label>
+                        <Input
+                          name="address_line_2"
+                          label="Adress Line 2 "
+                          placeholder="First Line Adress"
+                          type="text"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.address_line_2 || ""}
+                          invalid={
+                            rangeValidation.touched.address_line_2 &&
+                            rangeValidation.errors.address_line_2
+                              ? true
+                              : false
+                          }
+                        />
+                        {rangeValidation.touched.address_line_2 &&
+                        rangeValidation.errors.address_line_2 ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.address_line_2}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label for="country">Country:</Label>
+                        <Input
+                          type="select"
+                          name="country"
+                          id="country"
+                          value={rangeValidation.values.country || ""}
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          invalid={
+                            rangeValidation.touched.country &&
+                            rangeValidation.errors.country
+                          }
+                        ></Input>
+                        {rangeValidation.touched.country &&
+                        rangeValidation.errors.country ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.country}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
 
-              <div className="line" />
-            </Nav>
-            <TabContent activeTab={activeTab} className="mt-3">
-              <TabPane tabId="1">
-                <Form onSubmit={formik1.handleSubmit}>
-                  <FormGroup>
-                    <Label for="companyName">Company Name</Label>
-                    <Input
-                      type="text"
-                      name="companyName"
-                      id="companyName"
-                      value={formik1.values.companyName}
-                      onChange={formik1.handleChange}
-                    />
-                    {formik1.errors.companyName && <div className="text-danger">{formik1.errors.companyName}</div>}
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="companyEmail">Email</Label>
-                    <Input
-                      type="email"
-                      name="companyEmail"
-                      id="companyEmail"
-                      value={formik1.values.companyEmail}
-                      onChange={formik1.handleChange}
-                    />
-                    {formik1.errors.companyEmail && <div className="text-danger">{formik1.errors.companyEmail}</div>}
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="contact">Contact No.</Label>
-                    <Input
-                      type="number"
-                      name="contact"
-                      id="contact"
-                      value={formik1.values.contact}
-                      onChange={formik1.handleChange}
-                    />
-                    {formik1.errors.contact && <div className="text-danger">{formik1.errors.contact}</div>}
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="address">Address</Label>
-                    <Input
-                      type="text"
-                      name="address"
-                      id="address"
-                      value={formik1.values.address}
-                      onChange={formik1.handleChange}
-                    />
-                    {formik1.errors.address && <div className="text-danger">{formik1.errors.address}</div>}
-                  </FormGroup>
-                  <div className="d-flex justify-content-end">
-                    <Button color="primary" type="submit">Next</Button>
-                  </div>
-                </Form>
-              </TabPane>
-              <TabPane tabId="2">
-                <Form onSubmit={formik2.handleSubmit}>
-                  <FormGroup>
-                    <Label for="name">Name</Label>
-                    <Input
-                      type="text"
-                      name="name"
-                      id="name"
-                      value={formik2.values.name}
-                      onChange={formik2.handleChange}
-                    />
-                    {formik2.errors.name && <div className="text-danger">{formik2.errors.name}</div>}
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="email">Email</Label>
-                    <Input
-                      type="email"
-                      name="email"
-                      id="email"
-                      value={formik2.values.email}
-                      onChange={formik2.handleChange}
-                    />
-                    {formik2.errors.email && <div className="text-danger">{formik2.errors.email}</div>}
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="mobile">Mobile</Label>
-                    <Input
-                      type="text"
-                      name="mobile"
-                      id="mobile"
-                      value={formik2.values.mobile}
-                      onChange={formik2.handleChange}
-                    />
-                    {formik2.errors.mobile && <div className="text-danger">{formik2.errors.mobile}</div>}
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="designation">Designation</Label>
-                    <Input
-                      type="text"
-                      name="designation"
-                      id="designation"
-                      value={formik2.values.designation}
-                      onChange={formik2.handleChange}
-                    />
-                    {formik2.errors.designation && <div className="text-danger">{formik2.errors.designation}</div>}
-                  </FormGroup>
-                  <div className="d-flex justify-content-between">
-                    <Button color="secondary" onClick={() => setActiveTab('1')}>Previous</Button>
-                    <Button color="primary" type="submit">Next</Button>
-                  </div>
-                </Form>
-              </TabPane>
-              <TabPane tabId="3">
-                <Form onSubmit={formik3.handleSubmit}>
-                  <FormGroup>
-                    <Col md="3">
-                      <Form>
-                        <FormGroup>
-                          <div className="d-flex flex-column mt-3">
-                            <FormGroup check>
-                              <Label check>
-                                <Input type="checkbox" name={`service_4`} className="form-check-input-md" />
-                                Another Service 1
-                              </Label>
-                            </FormGroup>
-                            <FormGroup check>
-                              <Label check>
-                                <Input type="checkbox" name={`service_5`} className="form-check-input-md" />
-                                Another Service 2
-                              </Label>
-                            </FormGroup>
-                          </div>
-                          <div className="d-flex flex-column">
-                            <FormGroup check>
-                              <Label check>
-                                <Input type="checkbox" name={`service_6`} className="form-check-input-md" />
-                                Another Service 3
-                              </Label>
-                            </FormGroup>
-                            <FormGroup check>
-                              <Label check>
-                                <Input type="checkbox" name={`service_7`} className="form-check-input-md" />
-                                Another Service 4
-                              </Label>
-                            </FormGroup>
-                          </div>
-                        </FormGroup>
-                      </Form>
-                    </Col>
-                  </FormGroup>
-                  <div className="d-flex justify-content-between">
-                    <Button color="secondary" onClick={() => setActiveTab('2')}>Previous</Button>
-                    <Button color="primary" type="submit">Next</Button>
-                  </div>
-                </Form>
-              </TabPane>
-              <TabPane tabId="4">
-                <Form onSubmit={formik4.handleSubmit}>
-                  <FormGroup>
-                    <Label for="clientName">Client Name</Label>
-                    <Input type="text" name="clientName" id="clientName" placeholder="Enter client name for billing" value={formik4.values.clientName} onChange={formik4.handleChange} />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="billingAddress">Billing Address</Label>
-                    <Input type="text" name="billingAddress" id="billingAddress" placeholder="Enter billing address" value={formik4.values.billingAddress} onChange={formik4.handleChange} />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="creditCardNumber">Credit Card Number</Label>
-                    <Input type="text" name="creditCardNumber" id="creditCardNumber" placeholder="Enter credit card number" value={formik4.values.creditCardNumber} onChange={formik4.handleChange} />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="expirationDate">Expiration Date</Label>
-                    <Input type="text" name="expirationDate" id="expirationDate" placeholder="Enter expiration date (MM/YY)" value={formik4.values.expirationDate} onChange={formik4.handleChange} />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="cvv">CVV</Label>
-                    <Input type="text" name="cvv" id="cvv" placeholder="Enter CVV" value={formik4.values.cvv} onChange={formik4.handleChange} />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="billingAmount">Billing Amount</Label>
-                    <Input type="number" name="billingAmount" id="billingAmount" placeholder="Enter billing amount" value={formik4.values.billingAmount} onChange={formik4.handleChange} />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="paymentMethod">Payment Method</Label>
-                    <Input type="select" name="paymentMethod" id="paymentMethod" value={formik4.values.paymentMethod} onChange={formik4.handleChange}>
-                      <option>Credit Card</option>
-                      <option>Debit Card</option>
-                      <option>PayPal</option>
-                      <option>Bank Transfer</option>
-                      <option>UPI</option>
-                    </Input>
-                  </FormGroup>
-                  <div className="d-flex justify-content-between">
-                    <Button color="secondary" onClick={() => setActiveTab('3')}>Previous</Button>
-                    <Button color="primary" type="submit">Submit</Button>
-                  </div>
-                </Form>
-              </TabPane>
-            </TabContent>
-          </CardBody>
-        </Card>
-      </Container>
-    </div>
+                      <Col md={3} className="mb-3">
+                        <Label>State :</Label>
+                        <Input
+                          name="state"
+                          label="State"
+                          placeholder="Select a state"
+                          type="select"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.state || ""}
+                          invalid={
+                            rangeValidation.touched.state &&
+                            rangeValidation.errors.state
+                              ? true
+                              : false
+                          }
+                        ></Input>
+                        {rangeValidation.touched.state &&
+                        rangeValidation.errors.state ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.state}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={3} className="mb-3">
+                        <Label>City :</Label>
+                        <Input
+                          name="city"
+                          label="City"
+                          placeholder="Select a city"
+                          type="select"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.city || ""}
+                          invalid={
+                            rangeValidation.touched.city &&
+                            rangeValidation.errors.city
+                              ? true
+                              : false
+                          }
+                        ></Input>
+                        {rangeValidation.touched.city &&
+                        rangeValidation.errors.city ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.city}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Postal Code :</Label>
+                        <Input
+                          name="zip_code"
+                          label="zip_code"
+                          placeholder="Enter your zip code"
+                          type="text"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.zip_code || ""}
+                          invalid={
+                            rangeValidation.touched.zip_code &&
+                            rangeValidation.errors.zip_code
+                              ? true
+                              : false
+                          }
+                        ></Input>
+                        {rangeValidation.touched.zip_code &&
+                        rangeValidation.errors.zip_code ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.zip_code}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Currency :</Label>
+                        <Input
+                          name="currency"
+                          label="currency"
+                          placeholder="Currency"
+                          type="text"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.currency || ""}
+                          invalid={
+                            rangeValidation.touched.currency &&
+                            rangeValidation.errors.currency
+                              ? true
+                              : false
+                          }
+                        ></Input>
+                        {rangeValidation.touched.currency &&
+                        rangeValidation.errors.currency ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.currency}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Timezone :</Label>
+                        <Input
+                          name="timezone"
+                          label="timezone"
+                          placeholder="Timezone"
+                          type="text"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.timezone || ""}
+                          invalid={
+                            rangeValidation.touched.timezone &&
+                            rangeValidation.errors.timezone
+                              ? true
+                              : false
+                          }
+                        ></Input>
+                        {rangeValidation.touched.timezone &&
+                        rangeValidation.errors.timezone ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.currency}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                    </Row>
+                    <Row>
+                    <Col md={3} className="mb-3">
+                        <Label>Tax No :</Label>
+                        <Input
+                          name="tax_number"
+                          label="tax_number"
+                          placeholder="Enter Tax Number"
+                          type="text"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.tax_number || ""}
+                          invalid={
+                            rangeValidation.touched.tax_number &&
+                            rangeValidation.errors.tax_number
+                              ? true
+                              : false
+                          }
+                        ></Input>
+                        {rangeValidation.touched.tax_number &&
+                        rangeValidation.errors.tax_number ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.tax_number}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>logo :</Label>
+                        <Input
+                          name="logo"
+                          label="logo"
+                          placeholder="Enter Tax Number"
+                          type="file"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.logo || ""}
+                          invalid={
+                            rangeValidation.touched.logo &&
+                            rangeValidation.errors.logo
+                              ? true
+                              : false
+                          }
+                        ></Input>
+                        {rangeValidation.touched.logo &&
+                        rangeValidation.errors.logo ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.logo}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Credit period :</Label>
+                        <Input
+                          name="credit_period"
+                          label="credit_period"
+                          placeholder="Enter Tax Number"
+                          type="text"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.credit_period || ""}
+                          invalid={
+                            rangeValidation.touched.credit_period &&
+                            rangeValidation.errors.credit_period
+                              ? true
+                              : false
+                          }
+                        ></Input>
+                        {rangeValidation.touched.credit_period &&
+                        rangeValidation.errors.credit_period ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.credit_period}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                    </Row>
+                    <FormGroup className="mb-0">
+                      <div>
+                        <Button type="submit" color="primary" className="ms-1">
+                          Submit
+                        </Button>{" "}
+                        <Button type="reset" color="secondary" onClick={handleCancle}>
+                          Cancel
+                        </Button>
+                      </div>
+                    </FormGroup>
+                  </Form>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+    </React.Fragment>
   );
 };
 

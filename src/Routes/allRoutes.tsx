@@ -183,6 +183,7 @@ import Org from "pages/Clients/Org";
 import AddSubClient from "pages/Clients/AddSubClient";
 import SubClientsData from "pages/Clients/SubClientsData";
 import NewHost from "pages/Websites/NewHosting";
+import Webdetails from "pages/Websites/Webdetails";
 
 
 const authProtectedRoutes = [
@@ -339,7 +340,7 @@ const authProtectedRoutes = [
   //calendar
   { path: "/clients", component: <Clients /> },
   {path:"/addclientpage", component:<AddClient/>},
-  {path:"/clientdata",component:<ClientData/>},
+  {path:"/ClientDetail/:id",component:<ClientData/>},
   {path:"/addsuborg",component:<SubOrg/>},
   {path:"/org",component:<Org/>},
   {path:"/addsub-client",component:<AddSubClient/>},
@@ -351,6 +352,7 @@ const authProtectedRoutes = [
   { path: "/checkpoint", component: <Checkpoint /> },
   {path: "/websites", component:<Websites/>},
   {path:"/newhosting",component:<NewHost/>},
+  {path:"/Webdetails/:id",component:<Webdetails/>},
 ];
 
 const publicRoutes = [

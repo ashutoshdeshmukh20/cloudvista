@@ -130,7 +130,6 @@ const Clients = (props: any) => {
                 },
             },
         ],
-        [handleUserClick]
     );
 
     return (

@@ -129,11 +129,11 @@ const Clients = (props: any) => {
                     );
                 },
             },
-        ],
+        ],[]
     );
+    
 
     return (
-        <React.Fragment>
             <div className="page-content">
                 <Container fluid={true}>
                     {/* Render Breadcrumb */}
@@ -169,7 +169,6 @@ const Clients = (props: any) => {
                     </Row>
                 </Container>
             </div>
-        </React.Fragment>
     );
 };
 

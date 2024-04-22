@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-    name: CloudVista
+    name: CloudVista  # Name of self-hosted runner
 
     steps:
       - name: Checkout code

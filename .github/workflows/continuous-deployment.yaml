@@ -24,7 +24,16 @@ jobs:
         with:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           REMOTE_HOST: ${{ secrets.EC2_HOST }}
-          REMOTE_USER: ubuntu
+          REMOTE_USER: root
           REMOTE_PORT: ${{ secrets.SERVER_PORT }}
           SOURCE: build/*
           TARGET: /var/www/html/my-react-app/build/
+
+      - name: Removing existing contents
+        run: ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_HOST }} -p ${{ secrets.SERVER_PORT }} 'rm -rf /var/www/html/my-react-app/build/*'
+
+      - name: Coping new contents
+        run: ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_HOST }} -p ${{ secrets.SERVER_PORT }} 'cp -r build/* /var/www/html/my-react-app/build/'
+
+      - name: Restart Nginx
+        run: ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_HOST }} -p ${{ secrets.SERVER_PORT }} 'sudo service nginx restart'

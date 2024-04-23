@@ -19,10 +19,6 @@ jobs:
       - name: Build
         run: yarn build
 
-      - name: Get EC2 instance host key
-        run: |
-          sudo ssh-keyscan -H ${{ secrets.EC2_HOST }} >> /home/runner/.ssh/known_hosts 2>&1 || exit 1
-
       - name: SSH into EC2 instance and deploy
         uses: appleboy/ssh-action@master
         with:

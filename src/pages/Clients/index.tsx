@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
     Card, CardBody, CardTitle, Col, Container, Row, UncontrolledTooltip,
 } from "reactstrap";
@@ -15,14 +15,12 @@ const Clients = (props: any) => {
     //meta title
     document.title = "Clients";
 
-    const [contact, setContact] = useState<any>();
-    const [isEdit, setIsEdit] = useState<boolean>(false);
     const [modal, setModal] = useState<boolean>(false);
-
+/*
     const toggle = useCallback(() => {
         setModal(!modal);
     }, [modal]);
-{/*
+
     const handleUserClick = useCallback((arg: any) => {
         const user = arg;
 
@@ -39,7 +37,7 @@ const Clients = (props: any) => {
         toggle();
     }, [toggle]);
 
-*/}
+*/
     const columns = useMemo(
         () => [
             {

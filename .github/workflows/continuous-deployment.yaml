@@ -19,6 +19,11 @@ jobs:
       - name: Build
         run: yarn build
 
+      - name: Prepare SSH
+        run: |
+          mkdir -p ~/.ssh
+          touch ~/.ssh/known_hosts
+
       - name: Get EC2 instance host key
         run: ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 

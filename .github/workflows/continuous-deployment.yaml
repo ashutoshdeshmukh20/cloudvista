@@ -20,10 +20,11 @@ jobs:
         run: yarn build
 
       - name: SSH into EC2 instance and deploy
-        uses: appleboy/ssh-action@master
+        uses: easingthemes/ssh-deploy@v2
         with:
-          host: ${{ secrets.EC2_HOST }}
+          server: ${{ secrets.EC2_HOST }}
           username: ubuntu
+          port: ${{ secrets.SERVER_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            scp -r build/* ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/my-react-app/build/
+          source: build/*
+          target: /var/www/html/my-react-app/build/

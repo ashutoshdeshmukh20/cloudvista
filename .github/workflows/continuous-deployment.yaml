@@ -26,4 +26,4 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            scp -r build/* ubuntu@ec2-instance:/var/www/html/my-react-app/build/
+            scp -r build/* ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/my-react-app/build/

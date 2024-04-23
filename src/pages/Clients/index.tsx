@@ -108,18 +108,18 @@ const Clients = (props: any) => {
                     return (
                         <div className="d-flex gap-3">
                             <Link to="#" className="text-success"
-                                onClick={() => {
-                                    const userData = cellProps.row.original;
+                                /* onClick={() => {
+                                    //const userData = cellProps.row.original;
                                     //   handleUserClick(userData);
-                                }} >
+                                }} >*/ 
                                 <i className="mdi mdi-pencil font-size-18" id="edittooltip" />
                                 <UncontrolledTooltip placement="top" target="edittooltip"> Edit </UncontrolledTooltip>
                             </Link>
                             <Link to="#" className="text-danger"
-                                onClick={() => {
-                                    const userData = cellProps.row.original;
+                                /*onClick={() => {
+                                    // const userData = cellProps.row.original;
                                     //   onClickDelete(userData.id);
-                                }}  >
+                                }}  > */
                                 <i className="mdi mdi-delete font-size-18" id="deletetooltip" />
                                 <UncontrolledTooltip placement="top" target="deletetooltip"> Delete </UncontrolledTooltip>
                             </Link>

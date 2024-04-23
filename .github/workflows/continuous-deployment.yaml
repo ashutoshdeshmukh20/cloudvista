@@ -31,6 +31,7 @@ jobs:
 
       - name: Restart Nginx
         run: |
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_HOST }} << EOF
-          sudo service nginx restart
-          EOF
+          ssh_command="sudo service nginx restart"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key.pem
+          chmod 600 ssh_key.pem
+          ssh -i ssh_key.pem ubuntu@${{ secrets.EC2_HOST }} "${ssh_command}"

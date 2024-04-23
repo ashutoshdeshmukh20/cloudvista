@@ -14,9 +14,9 @@ import BarChart from "./barchart"
 const Clients = (props: any) => {
     //meta title
     document.title = "Clients";
+/*
 
     const [modal, setModal] = useState<boolean>(false);
-/*
     const toggle = useCallback(() => {
         setModal(!modal);
     }, [modal]);

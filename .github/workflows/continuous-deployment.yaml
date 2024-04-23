@@ -24,7 +24,7 @@ jobs:
         with:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           REMOTE_HOST: ${{ secrets.EC2_HOST }}
-          REMOTE_USER: root
+          REMOTE_USER: ubuntu
           REMOTE_PORT: ${{ secrets.SERVER_PORT }}
           SOURCE: build/*
           TARGET: /var/www/html/my-react-app/build/

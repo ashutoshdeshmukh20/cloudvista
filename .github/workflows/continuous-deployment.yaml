@@ -29,11 +29,11 @@ jobs:
           SOURCE: build/*
           TARGET: /var/www/html/my-react-app/build/
 
-      - name: Removing existing contents
-        run: ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_HOST }} -p ${{ secrets.SERVER_PORT }} 'rm -rf /var/www/html/my-react-app/build/*'
+      - name: Remove existing contents of /var/www/html/my-react-app/build/
+        run: ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_HOST }} 'rm -rf /var/www/html/my-react-app/build/*'
 
-      - name: Coping new contents
-        run: ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_HOST }} -p ${{ secrets.SERVER_PORT }} 'cp -r build/* /var/www/html/my-react-app/build/'
+      - name: Copy new contents to /var/www/html/my-react-app/build/
+        run: scp -i ${{ secrets.SSH_PRIVATE_KEY }} -r build/* ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/my-react-app/build/
 
       - name: Restart Nginx
-        run: ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_HOST }} -p ${{ secrets.SERVER_PORT }} 'sudo service nginx restart'
+        run: ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_HOST }} 'sudo service nginx restart'

@@ -30,4 +30,7 @@ jobs:
           TARGET: /var/www/html/my-react-app/
 
       - name: Restart Nginx
-        run: ssh -i ${{ secrets.SSH_PRIVATE_KEY }} -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'sudo service nginx restart'
+        run: |
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_HOST }} << EOF
+          sudo service nginx restart
+          EOF

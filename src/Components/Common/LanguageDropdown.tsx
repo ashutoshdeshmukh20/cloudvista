@@ -14,7 +14,6 @@ import i18n from "../../i18n";
 import languages from "../../common/languages";
 
 //img
-import usflag from "assets/images/flags/us.jpg";
 import indiaflag from "assets/images/flags/india.jpg";
 
 const LanguageDropdown = (props: any) => {

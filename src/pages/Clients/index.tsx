@@ -22,7 +22,7 @@ const Clients = (props: any) => {
     const toggle = useCallback(() => {
         setModal(!modal);
     }, [modal]);
-
+{/*
     const handleUserClick = useCallback((arg: any) => {
         const user = arg;
 
@@ -39,7 +39,7 @@ const Clients = (props: any) => {
         toggle();
     }, [toggle]);
 
-
+*/}
     const columns = useMemo(
         () => [
             {

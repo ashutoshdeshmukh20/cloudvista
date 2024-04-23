@@ -22,9 +22,9 @@ jobs:
       - name: SSH into EC2 instance and deploy
         uses: easingthemes/ssh-deploy@v2
         with:
-          server: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          port: ${{ secrets.SERVER_PORT }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: build/*
-          target: /var/www/html/my-react-app/build/
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.EC2_HOST }}
+          REMOTE_USER: ubuntu
+          REMOTE_PORT: ${{ secrets.SERVER_PORT }}
+          SOURCE: build/*
+          TARGET: /var/www/html/my-react-app/build/

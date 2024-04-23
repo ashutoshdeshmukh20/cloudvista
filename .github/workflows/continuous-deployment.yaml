@@ -26,14 +26,8 @@ jobs:
           REMOTE_HOST: ${{ secrets.EC2_HOST }}
           REMOTE_USER: ubuntu
           REMOTE_PORT: ${{ secrets.SERVER_PORT }}
-          SOURCE: build/*
-          TARGET: /var/www/html/my-react-app/build/
-
-      - name: Remove existing contents of /var/www/html/my-react-app/build/
-        run: rsync -avz -e "ssh -i ${{ secrets.SSH_PRIVATE_KEY }}" -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'rm -rf /var/www/html/my-react-app/build/*'
-
-      - name: Copy new contents to /var/www/html/my-react-app/build/
-        run: rsync -avz -e "ssh -i ${{ secrets.SSH_PRIVATE_KEY }}" build/ ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/my-react-app/build/
+          SOURCE: build
+          TARGET: /var/www/html/my-react-app/
 
       - name: Restart Nginx
         run: rsync -avz -e "ssh -i ${{ secrets.SSH_PRIVATE_KEY }}" -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'sudo service nginx restart'

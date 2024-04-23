@@ -19,12 +19,10 @@ jobs:
       - name: Build
         run: yarn build
 
-      - name: SSH into EC2 instance and deploy
-        uses: easingthemes/ssh-deploy@v2
-        with:
+      - name: Deploy to EC2
+        run: |
+          sudo rsync -avz --delete build/ ubuntu@${{ secrets.EC2_HOST }}:/var/www/html/my-react-app/build/
+          ssh ubuntu@${{ secrets.EC2_HOST }} 'sudo service nginx restart'
+        env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.EC2_HOST }}
-          REMOTE_USER: ubuntu
-          REMOTE_PORT: ${{ secrets.SERVER_PORT }}
-          SOURCE: build/*
-          TARGET: /var/www/html/my-react-app/build/
+          EC2_HOST: ${{ secrets.EC2_HOST }}

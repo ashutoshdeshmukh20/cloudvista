@@ -1,0 +1,37 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build
+        run: yarn build
+
+      - name: SSH into EC2 instance and deploy
+        uses: easingthemes/ssh-deploy@v2
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.EC2_HOST }}
+          REMOTE_USER: ubuntu
+          REMOTE_PORT: ${{ secrets.SERVER_PORT }}
+          SOURCE: build
+          TARGET: /var/www/html/my-react-app/
+
+      - name: Restart Nginx
+        run: |
+          ssh_command="sudo service nginx restart"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key.pem
+          chmod 600 ssh_key.pem
+          ssh -i ssh_key.pem ubuntu@${{ secrets.EC2_HOST }} "${ssh_command}"

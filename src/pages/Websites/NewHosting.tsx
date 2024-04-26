@@ -1,329 +1,534 @@
-import React, { useState } from "react";
-import Breadcrumbs from "Components/Common/Breadcrumb";
+import React, { useState, useEffect } from "react";
 import {
-  Container,
+  Row,
+  Col,
   Card,
   CardBody,
-  Form,
-  Row,
-  Label,
-  Col,
-  Input,
+  FormGroup,
   Button,
+  Label,
+  Input,
+  Container,
+  FormFeedback,
+  Form,
 } from "reactstrap";
-import { APIClient } from "../../helpers/api_helper";
+import * as Yup from "yup";
+import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
+import Breadcrumbs from "../../Components/Common/Breadcrumb";
+import { APIClient } from "../../helpers/api_helper";
+
 const api = new APIClient();
 const NewHosting = () => {
-    const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    domain: "",
-    ssl: "",
-    created_timestamp: "",
-    amc: "",
-    amc_charges: 0,
-    amc_renewal_period: "",
-    hosting: "",
-    hosting_charges: 0,
-    hosting_renewal_period: "",
-    hosting_renewal_date: "",
-    total_charges: 0,
-    payment_date: "",
-    payment_status: "",
+  const [nextRenewalDate, setNextRenewalDate] = useState("");
+  const navigate = useNavigate();
+  const handleCancle = () => {
+    navigate("/websites");
+  }
+
+  document.title = "Add Web | CV";
+  const rangeValidation: any = useFormik({
+    enableReinitialize: true,
+
+    initialValues: {
+      domain: "",
+      ssl: "",
+      created_timestamp: "",
+      amc: "",
+      amc_charges: 0,
+      amc_renewal_period: "",
+      hosting: "",
+      hosting_charges: 0,
+      hosting_renewal_period: "",
+      hosting_renewal_date: "",
+      total_charges: 0,
+      payment_date: "",
+      payment_status: "",
+    },
+    validationSchema: Yup.object().shape({
+      domain: Yup.string().required('Domain name is required'),
+      ssl: Yup.string().required('SSL status is required'),
+      created_timestamp: Yup.date().required('Creation timestamp is required'),
+      amc: Yup.string().required('AMC name is required'),
+      amc_charges: Yup.number().required('AMC charges are required'),
+      amc_renewal_period: Yup.string().required('AMC renewal period is required'),
+      hosting: Yup.string().required('Hosting name is required'),
+      hosting_charges: Yup.number().required('Hosting charges are required'),
+      hosting_renewal_period: Yup.string().required('Hosting renewal period is required'),
+      hosting_renewal_date: Yup.date().required('Hosting renewal date is required'),
+      total_charges: Yup.number().required('Total charges are required'),
+      payment_date: Yup.date().required('Payment date is required'),
+      payment_status: Yup.string().required('Payment status is required')
+    }),
+    onSubmit: async (values) => {
+      try {
+
+        const response = await api.create("add-websites", values);
+        console.log(response.new_websites);
+        navigate("/websites");
+      } catch (error) {
+        console.error("Error occurred while submitting form:", error);
+      }
+    },
   });
 
-//validation schema
+  const calculateNextRenewalDate = () => {
+    const registrationDate = new Date(rangeValidation.values.created_timestamp);
+    const renewalPeriod = parseInt(rangeValidation.values.hosting_renewal_period);
 
-const calculateNextRenewalDate = (amc_renewal_period: number, created_timestamp: string) => {
-  if (!created_timestamp) return ""; // If registered date is not provided, return empty string
-  const currentDate = new Date(created_timestamp);
-  const nextRenewalDate = new Date(currentDate.getFullYear() + parseInt(amc_renewal_period.toString()), currentDate.getMonth(), currentDate.getDate());
-  return nextRenewalDate.toLocaleDateString();
-};
-
-const handleRenewalPeriodChange = (e: { target: { value: any; }; }) => {
-  const { value } = e.target;
-  const nextRenewalDate = value ? calculateNextRenewalDate(parseInt(value), formData.created_timestamp) : " ";
-  setFormData({
-      ...formData,
-      amc_renewal_period: value,
-      hosting_renewal_date: nextRenewalDate
-  });
-};
-
-const handleHostingRenewalPeriodChange = (e: { target: { value: any; }; }) => {
-  const { value } = e.target;
-  const nextHostingRenewalDate = value ? calculateNextRenewalDate(parseInt(value), formData.created_timestamp) : " ";
-  setFormData({
-      ...formData,
-      hosting_renewal_period: value,
-      hosting_renewal_date: nextHostingRenewalDate
-  });
-};
-
-const handleAMCChargesChange = (e: { target: { value: any; }; }) => {
-  const { value } = e.target;
-  const amcCharges = parseFloat(value);
-  const totalPayment = amcCharges + formData.hosting_charges;
-
-  setFormData({
-      ...formData,
-      amc_charges:amcCharges,
-      total_charges: totalPayment
-  });
-};
-
-const handleHostingChargesChange = (e: { target: { value: any; }; }) => {
-  const { value } = e.target;
-  const hostingCharges = parseFloat(value);
-  const totalPayment = formData.amc_charges + hostingCharges;
-
-  setFormData({
-      ...formData,
-      hosting_charges:hostingCharges,
-      total_charges: totalPayment
-  });
-};
-
-
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-
-    try {
-      const response = await api.create("add-websites", formData);
-      console.log("Response from server:", response);
-    } catch (error) {
-      console.error("Error submitting form:", error);
+    if (!isNaN(renewalPeriod) && registrationDate instanceof Date && !isNaN(registrationDate.getTime())) {
+      let nextRenewal = new Date(registrationDate);
+      nextRenewal.setFullYear(nextRenewal.getFullYear() + renewalPeriod);
+      setNextRenewalDate(nextRenewal.toISOString().split('T')[0]);
     }
   };
 
-  const handleCancleClick = () => {
-    navigate("/websites");
-}
 
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+  useEffect(() => {
+    calculateNextRenewalDate();
+  }, [rangeValidation.values.created_timestamp, rangeValidation.values.amc_renewal_period, rangeValidation.values.hosting_renewal_period, calculateNextRenewalDate]);
+
+
+  const calculateTotalCharges = () => {
+    const amcCharges = parseFloat(rangeValidation.values.amc_charges) || 0;
+    const hostingCharges = parseFloat(rangeValidation.values.hosting_charges) || 0;
+    return amcCharges + hostingCharges;
   };
+
+
 
   return (
     <React.Fragment>
       <div className="page-content">
         <Container fluid={true}>
-          <Breadcrumbs title="Services" breadcrumbItem="Add New Web Hosting" />
-          <Card>
-            <CardBody>
-              <div>
-                <Form onSubmit={handleSubmit}>
-                  <Row>
-                  <Col md={3}>
-                      <Label htmlFor="name">Customer Name:</Label>
-                      <Input
-                        type="text"
-                        id="name"
-                        name="name"
-                        onChange={handleChange}
-                      />
-                    </Col>
-                    <Col md={3}>
-                      <Label htmlFor="domain">Domain:</Label>
-                      <Input
-                        type="text"
-                        id="domain"
-                        name="domain"
-                        value={formData.domain}
-                        onChange={handleChange}
-                      />
-                    </Col>
-                    <Col md={3}>
-                      <Label htmlFor="ssl">SSL:</Label>
-                      <Input
-                        id="ssl"
-                        type="select"
-                        name="ssl"
-                        value={formData.ssl}
-                        onChange={handleChange}
-                      >
-                        <option value="select">Select</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                      </Input>
-                    </Col>
+          <Breadcrumbs title="Websites" breadcrumbItem="Add Web" />
+          <Row>
+            <Col>
+              <Card>
+                <CardBody>
+                  <Form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      rangeValidation.handleSubmit();
+                      return false;
+                    }}
+                  >
+                    <Row>
+                      <Col md={3} className="mb-3">
+                        <Label>customer Name :</Label>
+                        <Input
+                          name="client_name"
+                          label="client_name name  "
+                          placeholder="Name"
+                          type="text"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.client_name || ""}
+                          invalid={
+                            rangeValidation.touched.client_name &&
+                              rangeValidation.errors.client_name
+                              ? true
+                              : false
+                          }
+                        />
+                        {rangeValidation.touched.client_name &&
+                          rangeValidation.errors.client_name ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.client_name}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Domain :</Label>
+                        <Input
+                          name="domain"
+                          label="domain"
+                          placeholder="example.com"
+                          type="text"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.domain || ""}
+                          invalid={
+                            rangeValidation.touched.domain &&
+                              rangeValidation.errors.domain
+                              ? true
+                              : false
+                          }
+                        />
+                        {rangeValidation.touched.domain &&
+                          rangeValidation.errors.domain ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.domain}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>SSL :</Label>
+                        <Input
+                          name="ssl"
+                          placeholder="Enter Your valid email"
+                          type="select"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.ssl || ""}
+                          invalid={
+                            rangeValidation.touched.ssl &&
+                              rangeValidation.errors.ssl
+                              ? true
+                              : false
+                          }
+                        >
+                          <option value="select">Select</option>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                        </Input>
+                        {rangeValidation.touched.ssl &&
+                          rangeValidation.errors.ssl ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.ssl}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Registered Date :</Label>
+                        <Input
+                          name="created_timestamp"
+                          placeholder="Select a date"
+                          type="date"
+                          onChange={(e) => { rangeValidation.handleChange(e); }}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.created_timestamp || ""}
+                          invalid={
+                            rangeValidation.touched.created_timestamp &&
+                              rangeValidation.errors.created_timestamp
+                              ? true
+                              : false
+                          }
+                        />
+                        {rangeValidation.touched.created_timestamp &&
+                          rangeValidation.errors.created_timestamp ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.created_timestamp}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={3} className="mb-3">
+                        <Label>AMC :</Label>
+                        <Input
+                          name="amc"
+                          label="AMC "
+                          type="select"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.amc || ""}
+                          invalid={
+                            rangeValidation.touched.amc &&
+                              rangeValidation.errors.amc
+                              ? true
+                              : false
+                          }
+                        >
+                          <option value="select">Select</option>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                        </Input>
+                        {rangeValidation.touched.amc &&
+                          rangeValidation.errors.amc ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.amc}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>AMC charges:</Label>
+                        <Input
+                          name="amc_charges"
+                          label="AMC charges"
+                          placeholder="Charges"
+                          type="text"
+                          onChange={(e) => {
+                            rangeValidation.handleChange(e);
+                          }}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.amc_charges || ""}
+                          invalid={
+                            rangeValidation.touched.amc_charges &&
+                              rangeValidation.errors.amc_charges
+                              ? true
+                              : false
+                          }
+                        />
+                        {rangeValidation.touched.amc_charges &&
+                          rangeValidation.errors.amc_charges ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.amc_charges}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label for="country">AMC Renewal period:</Label>
+                        <Input
+                          type="select"
+                          name="amc_renewal_period"
+                          id="amc_renewal_period"
+                          placeholder="Select"
+                          onChange={(e) => { rangeValidation.handleChange(e); }}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.amc_renewal_period || ""}
+                          invalid={
+                            rangeValidation.touched.amc_renewal_period &&
+                            rangeValidation.errors.amc_renewal_period
+                          }
+                        >
+                          <option value="select">Select</option>
+                          <option value="1Yr">1 Yr</option>
+                          <option value="3Yr">2 Yr</option>
+                          <option value="4Yr">3 Yr</option>
+                          <option value="5Yr">4 Yr</option>
+                        </Input>
+                        {rangeValidation.touched.amc_renewal_period &&
+                          rangeValidation.errors.amc_renewal_period ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.amc_renewal_period}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
 
-                    <Col md={3}>
-                      <Label htmlFor="created_timestamp">Reg Date:</Label>
-                      <Input
-                        type="date"
-                        id="created_timestamp"
-                        name="created_timestamp"
-                        value={formData.created_timestamp}
-                        onChange={handleChange}
-                      />
-                    </Col>
-                  </Row>
-                  <Row className="mt-3">
-                    <Col md={3}>
-                      <Label htmlFor="amc">AMC:</Label>
-                      <Input
-                        id="amc"
-                        type="select"
-                        name="amc"
-                        value={formData.amc}
-                        onChange={handleChange}
-                      >
-                        <option value="select">Select</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                      </Input>
-                    </Col>
-                    <Col md={3}>
-                      <Label htmlFor="amc_charges">AMC Charges:</Label>
-                      <Input
-                        type="number"
-                        id="amc_charges"
-                        name="amc_charges"
-                        value={formData.amc_charges}
-                        onChange={handleAMCChargesChange}
-                      />
-                    </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>AMC Next Renewal Date :</Label>
+                        <Input
+                          name="hosting_renewal_date"
+                          placeholder="Select a date"
+                          type="date"
+                          readOnly
+                          onChange={(e) => { rangeValidation.handleChange(e); }}
+                          onBlur={rangeValidation.handleBlur}
+                          value={nextRenewalDate}
+                          invalid={
+                            rangeValidation.touched.hosting_renewal_date &&
+                              rangeValidation.errors.hosting_renewal_date
+                              ? true
+                              : false
+                          }
+                        />
+                        {rangeValidation.touched.hosting_renewal_date &&
+                          rangeValidation.errors.hosting_renewal_date ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.hosting_renewal_date}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={3} className="mb-3">
+                        <Label>Hosting :</Label>
+                        <Input
+                          name="hosting"
+                          label="AMC "
+                          type="select"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.hosting || ""}
+                          invalid={
+                            rangeValidation.touched.hosting &&
+                              rangeValidation.errors.hosting
+                              ? true
+                              : false
+                          }
+                        >
+                          <option value="select">Select</option>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                        </Input>
+                        {rangeValidation.touched.hosting &&
+                          rangeValidation.errors.hosting ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.hosting}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Hosting Charges :</Label>
+                        <Input
+                          name="hosting_charges"
+                          label="hosting_charges"
+                          placeholder="Charges"
+                          type="text"
+                          onChange={(e) => {
+                            rangeValidation.handleChange(e);
+                          }}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.hosting_charges || ""}
+                          invalid={
+                            rangeValidation.touched.hosting_charges &&
+                              rangeValidation.errors.hosting_charges
+                              ? true
+                              : false
+                          }
+                        ></Input>
+                        {rangeValidation.touched.hosting_charges &&
+                          rangeValidation.errors.hosting_charges ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.hosting_charges}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Hosting Renewal Period :</Label>
+                        <Input
+                          name="hosting_renewal_period"
+                          label="hosting_renewal_period"
+                          placeholder="Currency"
+                          type="select"
+                          onChange={(e) => {
+                            rangeValidation.handleChange(e);
+                            calculateNextRenewalDate();
+                          }}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.hosting_renewal_period || ""}
+                          invalid={
+                            rangeValidation.touched.hosting_renewal_period &&
+                              rangeValidation.errors.hosting_renewal_period
+                              ? true
+                              : false
+                          }
+                        >
+                          <option value="select">Select</option>
+                          <option value="1Yr">1 Yr</option>
+                          <option value="2Yr">2 Yr</option>
+                          <option value="3Yr">3 Yr</option>
+                          <option value="4Yr">4 Yr</option>
+                        </Input>
+                        {rangeValidation.touched.hosting_renewal_period &&
+                          rangeValidation.errors.hosting_renewal_period ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.hosting_renewal_period}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Hosting Next Renewal Date :</Label>
+                        <Input
+                          name="hosting_renewal_date"
+                          placeholder="Select a date"
+                          type="date"
+                          readOnly
+                          onChange={(e) => { rangeValidation.handleChange(e); }}
+                          onBlur={rangeValidation.handleBlur}
+                          value={nextRenewalDate}
+                          invalid={
+                            rangeValidation.touched.hosting_renewal_date &&
+                              rangeValidation.errors.hosting_renewal_date
+                              ? true
+                              : false
+                          }
+                        />
+                        {rangeValidation.touched.hosting_renewal_date &&
+                          rangeValidation.errors.hosting_renewal_date ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.touched.hosting_renewal_date && rangeValidation.errors.hosting_renewal_date}
+                          </FormFeedback>
 
-                    <Col md={3}>
-                      <Label htmlFor="amc_renewal_period">
-                        AMC Renewal Period:
-                      </Label>
-                      <Input
-                        type="select"
-                        id="amc_renewal_period"
-                        name="amc_renewal_period"
-                        value={formData.amc_renewal_period}
-                        onChange={handleRenewalPeriodChange}
-                      >
-                        <option value="select">Select</option>
-                        <option value="1Yr">1 Yr</option>
-                        <option value="3Yr">3 Yr</option>
-                        <option value="4Yr">4 Yr</option>
-                        <option value="5Yr">5 Yr</option>
-                      </Input>
-                    </Col>
-                    <Col md={3}>
-                      <Label htmlFor="amc_renewal_date">
-                        AMC Renewal Date:
-                      </Label>
-                      <Input
-                        type="text"
-                        id="amc_renewal_date"
-                        name="amc_renewal_date"
-                        value={formData.hosting_renewal_date}
-                        onChange={handleChange}
-                      />
-                    </Col>
-                  </Row>
-                  <Row className="mt-3">
-                    <Col md={3}>
-                      <Label htmlFor="hosting">Hosting:</Label>
-                      <Input
-                        id="hosting"
-                        type="select"
-                        name="hosting"
-                        value={formData.hosting}
-                        onChange={handleChange}
-                      >
-                        <option value="select">Select</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                      </Input>
-                    </Col>
-                    <Col md={3}>
-                      <Label htmlFor="hosting_charges">Hosting Charges:</Label>
-                      <Input
-                        type="number"
-                        id="hosting_charges"
-                        name="hosting_charges"
-                        value={formData.hosting_charges}
-                        onChange={handleHostingChargesChange}
-                      />
-                    </Col>
-                    <Col md={3}>
-                      <Label htmlFor="hosting_renewal_period">
-                        Hosting Renewal Period:
-                      </Label>
-                      <Input
-                        type="select"
-                        id="hosting_renewal_period"
-                        name="hosting_renewal_period"
-                        value={formData.hosting_renewal_period}
-                        onChange={handleHostingRenewalPeriodChange}
-                      >
-                        <option value="select">Select</option>
-                        <option value="1Yr">1 Yr</option>
-                        <option value="3Yr">3 Yr</option>
-                        <option value="4Yr">4 Yr</option>
-                        <option value="5Yr">5 Yr</option>
-                      </Input>
-                    </Col>
-                    <Col md={3}>
-                      <Label htmlFor="hosting_renewal_date">
-                        Hosting Renewal Date:
-                      </Label>
-                      <Input
-                        type="text"
-                        id="hosting_renewal_date"
-                        name="hosting_renewal_date"
-                        value={formData.hosting_renewal_date}
-                        onChange={handleChange}
-                      />
-                    </Col>
-                  </Row>
-                  <Row className="mt-3">
-                    <Col md={3}>
-                      <Label htmlFor="payment_date">Payment Date:</Label>
-                      <Input
-                        type="date"
-                        id="payment_date"
-                        name="payment_date"
-                        value={formData.payment_date}
-                        onChange={handleChange}
-                      />
-                    </Col>
-                    <Col md={3}>
-                      <Label htmlFor="total_charges">Total Charges:</Label>
-                      <Input
-                        type="number"
-                        id="total_charges"
-                        name="total_charges"
-                        value={formData.total_charges}
-                        onChange={handleChange}
-                      />
-                    </Col>
-                    <Col md={3}>
-                      <Label htmlFor="payment_status">Payment Status:</Label>
-                      <Input
-                        type="select"
-                        id="payment_status"
-                        name="payment_status"
-                        value={formData.payment_status}
-                        onChange={handleChange}
-                      >
-                        <option value="select">Select</option>
-                        <option value="Unpaid">Unnpaid</option>
-                        <option value="Paid">Paid</option>
-                        <option value="pending">Pending</option>
-                      </Input>
-                    </Col>
-                  </Row>
-                  <Row className="mt-4">
-                    <div className="d-flex justify-content-end w-100 mt-3">
-                      <Button type="submit" color="success" className="me-2">Submit</Button>
-                      <Button type="button" color="danger" onClick={handleCancleClick}>Cancel</Button>
-                    </div>
-                  </Row>
-                </Form>
-              </div>
-            </CardBody>
-          </Card>
+                        ) : null}
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col md={3} className="mb-3">
+                        <Label>Payment Date :</Label>
+                        <Input
+                          name="payment_date"
+                          label="payment_date"
+                          placeholder=""
+                          type="date"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.payment_date || ""}
+                          invalid={
+                            rangeValidation.touched.payment_date &&
+                              rangeValidation.errors.payment_date
+                              ? true
+                              : false
+                          }
+                        ></Input>
+                        {rangeValidation.touched.payment_date &&
+                          rangeValidation.errors.payment_date ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.payment_date}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Total Charges :</Label>
+                        <Input
+                          name="total_charges"
+                          label="total_charges"
+                          placeholder="Total Charges"
+                          type="text"
+                          value={calculateTotalCharges()}
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+
+                          invalid={
+                            rangeValidation.touched.total_charges &&
+                              rangeValidation.errors.total_charges
+                              ? true
+                              : false
+                          }
+                        ></Input>
+                        {rangeValidation.touched.total_charges &&
+                          rangeValidation.errors.total_charges ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.total_charges}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                      <Col md={3} className="mb-3">
+                        <Label>Payment Status :</Label>
+                        <Input
+                          name="payment_status"
+                          label="payment_status"
+                          placeholder="Enter Tax Number"
+                          type="select"
+                          onChange={rangeValidation.handleChange}
+                          onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.payment_status || ""}
+                          invalid={
+                            rangeValidation.touched.payment_status &&
+                              rangeValidation.errors.payment_status
+                              ? true
+                              : false
+                          }
+                        >
+                          <option value="select">Select</option>
+                          <option value="Unpaid">Unnpaid</option>
+                          <option value="Paid">Paid</option>
+                          <option value="pending">Pending</option>
+                        </Input>
+                        {rangeValidation.touched.payment_status &&
+                          rangeValidation.errors.payment_status ? (
+                          <FormFeedback type="invalid">
+                            {rangeValidation.errors.payment_status}
+                          </FormFeedback>
+                        ) : null}
+                      </Col>
+                    </Row>
+                    <FormGroup className="mb-0">
+                      <div>
+                        <Button type="submit" color="primary" className="ms-1">
+                          Submit
+                        </Button>{" "}
+                        <Button type="reset" color="secondary" onClick={handleCancle}>
+                          Cancel
+                        </Button>
+                      </div>
+                    </FormGroup>
+                  </Form>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
         </Container>
       </div>
     </React.Fragment>

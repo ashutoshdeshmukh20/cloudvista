@@ -96,7 +96,7 @@ const Webdetails = (props: any) => {
                         type="select"
                         name="customer"
                         id="customer"
-                        defaultValue={CustomerData}
+                        defaultValue={CustomerData || ""}
                         readOnly={!editMode}
                         onChange={handleCustomerChange}
                       >

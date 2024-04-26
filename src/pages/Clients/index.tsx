@@ -15,6 +15,8 @@ import {
   UncontrolledDropdown,
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
+import Pagination from "Components/Common/Pagination";
+import tableData from "common/data/responsiveTableData";
 export const dummyData = [
   {
     id: 1,
@@ -686,6 +688,7 @@ const api = new APIClient();
 
 function Clients(props: any) {
   const [data, setData] = useState([]);
+  const [currentpages, setCurrentpages] = useState<any>(data)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -820,9 +823,15 @@ function Clients(props: any) {
                   </div>
                   <TableContainer
                     columns={columns}
-                    data={data} // Pass data here
+                    data={currentpages || []} 
                     customPageSize={10}
                     tableClass="table-striped display-all"
+                  />
+                  <Pagination
+                    perPageData={10}
+                    data={data}
+                    setCurrentpages={setCurrentpages}
+                    currentpages={currentpages}
                   />
                 </CardBody>
               </Card>

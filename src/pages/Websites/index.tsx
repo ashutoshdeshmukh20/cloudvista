@@ -17,6 +17,8 @@ import Breadcrumbs from "../../Components/Common/Breadcrumb";
 import TableContainer from "Components/Common/TableContainer";
 import { Link } from "react-router-dom";
 import { APIClient } from "../../helpers/api_helper";
+import Pagination from "Components/Common/Pagination";
+import tableData from "common/data/responsiveTableData";
 import {
   Domain,
   Newrenew,
@@ -32,11 +34,8 @@ const Websites = (props: any) => {
   //meta title
   document.title = "Websites";
   const navigate = useNavigate();
-
-  const [contact, setContact] = useState<any>();
-  const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [modal, setModal] = useState<boolean>(false);
   const [Data, setData] = useState([]);
+  const [currentpages, setCurrentpages] = useState<any>(Data)
 
   useEffect(() => {
     fetchData();
@@ -231,9 +230,15 @@ const Websites = (props: any) => {
                   </div>
                   <TableContainer
                     columns={columns}
-                    data={Data}
+                    data={currentpages || []}
                     customPageSize={10}
                     tableClass="table-striped display-all"
+                  />
+                  <Pagination
+                    perPageData={10}
+                    data={Data}
+                    setCurrentpages={setCurrentpages}
+                    currentpages={currentpages}
                   />
                 </CardBody>
               </Card>

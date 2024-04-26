@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { Country, State, City } from "country-state-city";
+import React from "react";
 import {
   Row,
   Col,
@@ -13,27 +12,26 @@ import {
   FormFeedback,
   Form,
 } from "reactstrap";
-// Formik validation
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
-
-//Import Breadcrumb
 import Breadcrumbs from "../../Components/Common/Breadcrumb";
+import { APIClient } from "../../helpers/api_helper";
 
+const api = new APIClient();
 const AddClient = () => {
   const navigate = useNavigate();
-  const handleCancle = () =>{
+  const handleCancle = () => {
     navigate("/clients");
   }
-  //meta title
-  document.title = "Add Client | CV";
+
+  document.title = "Add Client | CV"; 
   const rangeValidation: any = useFormik({
     enableReinitialize: true,
 
     initialValues: {
-      customer_name: "",
-      phone: "",
+      client_name: "",
+      phone_number: "",
       email: "",
       reg_date: "",
       address_line_1: "",
@@ -49,13 +47,13 @@ const AddClient = () => {
       credit_period: "",
     },
     validationSchema: Yup.object().shape({
-      customer_name: Yup.string()
+      client_name: Yup.string()
         .matches(
           /^[a-zA-Z\s]+$/,
           "Name cannot contain special characters or numbers"
         )
         .required("Customer Name is required"),
-      phone: Yup.string()
+        phone_number: Yup.string()
         .required("Phone is required")
         .matches(/^[0-9]+$/, "Phone number must contain only numbers")
         .min(10, "Phone number must be at least 10 digits")
@@ -81,7 +79,16 @@ const AddClient = () => {
       logo: Yup.string().required("Logo is required"),
       credit_period: Yup.number().required("Credit Period is required"),
     }),
-    onSubmit: (values) => console.log(JSON.stringify(values)),
+    onSubmit: async (values) => {
+      try {
+        
+        const response = await api.create("add-clients", values);
+        console.log(response.data);
+        navigate("/clients");
+      } catch (error) {
+        console.error("Error occurred while submitting form:", error);
+      }
+    },
   });
 
   return (
@@ -104,47 +111,48 @@ const AddClient = () => {
                       <Col md={3} className="mb-3">
                         <Label>customer Name :</Label>
                         <Input
-                          name="customer_name"
-                          label="customer name  "
+                          name="client_name"
+                          label="client_name name  "
                           placeholder="Name"
                           type="text"
                           onChange={rangeValidation.handleChange}
                           onBlur={rangeValidation.handleBlur}
-                          value={rangeValidation.values.customer_name || ""}
+                          value={rangeValidation.values.client_name || ""}
                           invalid={
-                            rangeValidation.touched.customer_name &&
-                            rangeValidation.errors.customer_name
+                            rangeValidation.touched.client_name &&
+                              rangeValidation.errors.client_name
                               ? true
                               : false
                           }
                         />
-                        {rangeValidation.touched.customer_name &&
-                        rangeValidation.errors.customer_name ? (
+                        {rangeValidation.touched.client_name &&
+                          rangeValidation.errors.client_name ? (
                           <FormFeedback type="invalid">
-                            {rangeValidation.errors.customer_name}
+                            {rangeValidation.errors.client_name}
                           </FormFeedback>
                         ) : null}
                       </Col>
                       <Col md={3} className="mb-3">
                         <Label>Phone :</Label>
                         <Input
-                          name="phone"
+                          name="phone_number"
+                          label="phone_number"
                           placeholder="Contact number"
                           type="text"
                           onChange={rangeValidation.handleChange}
                           onBlur={rangeValidation.handleBlur}
-                          value={rangeValidation.values.phone || ""}
+                          value={rangeValidation.values.phone_number || ""}
                           invalid={
-                            rangeValidation.touched.phone &&
-                            rangeValidation.errors.phone
+                            rangeValidation.touched.phone_number &&
+                              rangeValidation.errors.phone_number
                               ? true
                               : false
                           }
                         />
-                        {rangeValidation.touched.phone &&
-                        rangeValidation.errors.phone ? (
+                        {rangeValidation.touched.phone_number &&
+                          rangeValidation.errors.phone_number ? (
                           <FormFeedback type="invalid">
-                            {rangeValidation.errors.phone}
+                            {rangeValidation.errors.phone_number}
                           </FormFeedback>
                         ) : null}
                       </Col>
@@ -159,13 +167,13 @@ const AddClient = () => {
                           value={rangeValidation.values.email || ""}
                           invalid={
                             rangeValidation.touched.email &&
-                            rangeValidation.errors.email
+                              rangeValidation.errors.email
                               ? true
                               : false
                           }
                         />
                         {rangeValidation.touched.email &&
-                        rangeValidation.errors.email ? (
+                          rangeValidation.errors.email ? (
                           <FormFeedback type="invalid">
                             {rangeValidation.errors.email}
                           </FormFeedback>
@@ -182,13 +190,13 @@ const AddClient = () => {
                           value={rangeValidation.values.reg_date || ""}
                           invalid={
                             rangeValidation.touched.reg_date &&
-                            rangeValidation.errors.reg_date
+                              rangeValidation.errors.reg_date
                               ? true
                               : false
                           }
                         />
                         {rangeValidation.touched.reg_date &&
-                        rangeValidation.errors.reg_date ? (
+                          rangeValidation.errors.reg_date ? (
                           <FormFeedback type="invalid">
                             {rangeValidation.errors.reg_date}
                           </FormFeedback>
@@ -208,13 +216,13 @@ const AddClient = () => {
                           value={rangeValidation.values.address_line_1 || ""}
                           invalid={
                             rangeValidation.touched.address_line_1 &&
-                            rangeValidation.errors.address_line_1
+                              rangeValidation.errors.address_line_1
                               ? true
                               : false
                           }
                         />
                         {rangeValidation.touched.address_line_1 &&
-                        rangeValidation.errors.address_line_1 ? (
+                          rangeValidation.errors.address_line_1 ? (
                           <FormFeedback type="invalid">
                             {rangeValidation.errors.address_line_1}
                           </FormFeedback>
@@ -232,13 +240,13 @@ const AddClient = () => {
                           value={rangeValidation.values.address_line_2 || ""}
                           invalid={
                             rangeValidation.touched.address_line_2 &&
-                            rangeValidation.errors.address_line_2
+                              rangeValidation.errors.address_line_2
                               ? true
                               : false
                           }
                         />
                         {rangeValidation.touched.address_line_2 &&
-                        rangeValidation.errors.address_line_2 ? (
+                          rangeValidation.errors.address_line_2 ? (
                           <FormFeedback type="invalid">
                             {rangeValidation.errors.address_line_2}
                           </FormFeedback>
@@ -247,19 +255,22 @@ const AddClient = () => {
                       <Col md={3} className="mb-3">
                         <Label for="country">Country:</Label>
                         <Input
-                          type="select"
+                          type="text"
                           name="country"
                           id="country"
-                          value={rangeValidation.values.country || ""}
+                          placeholder="Select a Country"
                           onChange={rangeValidation.handleChange}
                           onBlur={rangeValidation.handleBlur}
+                          value={rangeValidation.values.country || ""}
                           invalid={
                             rangeValidation.touched.country &&
                             rangeValidation.errors.country
                           }
-                        ></Input>
+                        >
+                          
+                        </Input>
                         {rangeValidation.touched.country &&
-                        rangeValidation.errors.country ? (
+                          rangeValidation.errors.country ? (
                           <FormFeedback type="invalid">
                             {rangeValidation.errors.country}
                           </FormFeedback>
@@ -272,19 +283,19 @@ const AddClient = () => {
                           name="state"
                           label="State"
                           placeholder="Select a state"
-                          type="select"
+                          type="text"
                           onChange={rangeValidation.handleChange}
                           onBlur={rangeValidation.handleBlur}
                           value={rangeValidation.values.state || ""}
                           invalid={
                             rangeValidation.touched.state &&
-                            rangeValidation.errors.state
+                              rangeValidation.errors.state
                               ? true
                               : false
                           }
                         ></Input>
                         {rangeValidation.touched.state &&
-                        rangeValidation.errors.state ? (
+                          rangeValidation.errors.state ? (
                           <FormFeedback type="invalid">
                             {rangeValidation.errors.state}
                           </FormFeedback>
@@ -298,19 +309,19 @@ const AddClient = () => {
                           name="city"
                           label="City"
                           placeholder="Select a city"
-                          type="select"
+                          type="text"
                           onChange={rangeValidation.handleChange}
                           onBlur={rangeValidation.handleBlur}
                           value={rangeValidation.values.city || ""}
                           invalid={
                             rangeValidation.touched.city &&
-                            rangeValidation.errors.city
+                              rangeValidation.errors.city
                               ? true
                               : false
                           }
                         ></Input>
                         {rangeValidation.touched.city &&
-                        rangeValidation.errors.city ? (
+                          rangeValidation.errors.city ? (
                           <FormFeedback type="invalid">
                             {rangeValidation.errors.city}
                           </FormFeedback>
@@ -328,13 +339,13 @@ const AddClient = () => {
                           value={rangeValidation.values.zip_code || ""}
                           invalid={
                             rangeValidation.touched.zip_code &&
-                            rangeValidation.errors.zip_code
+                              rangeValidation.errors.zip_code
                               ? true
                               : false
                           }
                         ></Input>
                         {rangeValidation.touched.zip_code &&
-                        rangeValidation.errors.zip_code ? (
+                          rangeValidation.errors.zip_code ? (
                           <FormFeedback type="invalid">
                             {rangeValidation.errors.zip_code}
                           </FormFeedback>
@@ -352,13 +363,13 @@ const AddClient = () => {
                           value={rangeValidation.values.currency || ""}
                           invalid={
                             rangeValidation.touched.currency &&
-                            rangeValidation.errors.currency
+                              rangeValidation.errors.currency
                               ? true
                               : false
                           }
                         ></Input>
                         {rangeValidation.touched.currency &&
-                        rangeValidation.errors.currency ? (
+                          rangeValidation.errors.currency ? (
                           <FormFeedback type="invalid">
                             {rangeValidation.errors.currency}
                           </FormFeedback>
@@ -376,13 +387,13 @@ const AddClient = () => {
                           value={rangeValidation.values.timezone || ""}
                           invalid={
                             rangeValidation.touched.timezone &&
-                            rangeValidation.errors.timezone
+                              rangeValidation.errors.timezone
                               ? true
                               : false
                           }
                         ></Input>
                         {rangeValidation.touched.timezone &&
-                        rangeValidation.errors.timezone ? (
+                          rangeValidation.errors.timezone ? (
                           <FormFeedback type="invalid">
                             {rangeValidation.errors.currency}
                           </FormFeedback>
@@ -390,7 +401,7 @@ const AddClient = () => {
                       </Col>
                     </Row>
                     <Row>
-                    <Col md={3} className="mb-3">
+                      <Col md={3} className="mb-3">
                         <Label>Tax No :</Label>
                         <Input
                           name="tax_number"
@@ -402,13 +413,13 @@ const AddClient = () => {
                           value={rangeValidation.values.tax_number || ""}
                           invalid={
                             rangeValidation.touched.tax_number &&
-                            rangeValidation.errors.tax_number
+                              rangeValidation.errors.tax_number
                               ? true
                               : false
                           }
                         ></Input>
                         {rangeValidation.touched.tax_number &&
-                        rangeValidation.errors.tax_number ? (
+                          rangeValidation.errors.tax_number ? (
                           <FormFeedback type="invalid">
                             {rangeValidation.errors.tax_number}
                           </FormFeedback>
@@ -426,13 +437,13 @@ const AddClient = () => {
                           value={rangeValidation.values.logo || ""}
                           invalid={
                             rangeValidation.touched.logo &&
-                            rangeValidation.errors.logo
+                              rangeValidation.errors.logo
                               ? true
                               : false
                           }
                         ></Input>
                         {rangeValidation.touched.logo &&
-                        rangeValidation.errors.logo ? (
+                          rangeValidation.errors.logo ? (
                           <FormFeedback type="invalid">
                             {rangeValidation.errors.logo}
                           </FormFeedback>
@@ -450,13 +461,13 @@ const AddClient = () => {
                           value={rangeValidation.values.credit_period || ""}
                           invalid={
                             rangeValidation.touched.credit_period &&
-                            rangeValidation.errors.credit_period
+                              rangeValidation.errors.credit_period
                               ? true
                               : false
                           }
                         ></Input>
                         {rangeValidation.touched.credit_period &&
-                        rangeValidation.errors.credit_period ? (
+                          rangeValidation.errors.credit_period ? (
                           <FormFeedback type="invalid">
                             {rangeValidation.errors.credit_period}
                           </FormFeedback>

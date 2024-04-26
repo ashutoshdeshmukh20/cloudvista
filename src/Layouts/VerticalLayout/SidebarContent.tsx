@@ -187,7 +187,7 @@ const SidebarContent = (props: any) => {
             <li>
               <Link to="/#" className="has-arrow ">
                 <i className="bx bx-briefcase-alt-2"></i>
-                <span>{props.t("OEM")}</span>
+                <span>{props.t("Services")}</span>
               </Link>
               <ul className="sub-menu">
                 <li>
@@ -198,6 +198,9 @@ const SidebarContent = (props: any) => {
                 </li>
                 <li>
                   <Link to="/checkpoint">{props.t("Checkpoint")}</Link>
+                </li>
+                <li>
+                  <Link to="/websites">{props.t("Websites")}</Link>
                 </li>
               </ul>
             </li>

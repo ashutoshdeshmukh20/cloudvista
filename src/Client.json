@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "name": "John Doe",
+    "designation": "CEO",
+    "email": "john.doe@example.com",
+    "mobile": "123-456-7890",
+    "services": ["Consulting", "Marketing"]
+  },
+  {
+    "id": 2,
+    "name": "Jane Smith",
+    "designation": "CFO",
+    "email": "jane.smith@example.com",
+    "mobile": "987-654-3210",
+    "services": ["Accounting", "Financial Planning"]
+  },
+  {
+    "id": 3,
+    "name": "Bob Johnson",
+    "designation": "COO",
+    "email": "bob.johnson@example.com",
+    "mobile": "555-123-4567",
+    "services": ["Operations", "Supply Chain"]
+  },
+  {
+    "id": 4,
+    "name": "Alice Adams",
+    "designation": "CMO",
+    "email": "alice.adams@example.com",
+    "mobile": "999-888-7777",
+    "services": ["Marketing", "Public Relations"]
+  }
+]

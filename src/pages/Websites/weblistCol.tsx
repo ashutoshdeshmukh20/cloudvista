@@ -1,6 +1,4 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { size, map } from "lodash";
+
 
 const Domain = (cell: any) => {
     return cell.value ? cell.value : '';

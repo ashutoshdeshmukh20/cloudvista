@@ -16,7 +16,6 @@ import {
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import Pagination from "Components/Common/Pagination";
-import tableData from "common/data/responsiveTableData";
 export const dummyData = [
   {
     id: 1,
@@ -703,11 +702,12 @@ function Clients(props: any) {
       console.error("Error fetching data:", error);
     }
   };
-
+// eslint-disable-next-line 
   const onClickDelete = (user: any): void => {
     const updatedData = data.filter((item: any) => item.id !== user.id);
     setData(updatedData);
   };
+  // eslint-disable-next-line 
   const handleView = (id: number) => {  
     navigate(`/ClientDetail/${id}`);
   };
@@ -798,7 +798,7 @@ function Clients(props: any) {
         },
       },
     ],
-    []
+    [handleView,onClickDelete]
   );
 
   return (

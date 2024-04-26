@@ -71,7 +71,7 @@ const NewHosting = () => {
       }
     },
   });
-
+// eslint-disable-next-line 
   const calculateNextRenewalDate = () => {
     const registrationDate = new Date(rangeValidation.values.created_timestamp);
     const renewalPeriod = parseInt(rangeValidation.values.hosting_renewal_period);

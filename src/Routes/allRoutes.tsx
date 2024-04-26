@@ -178,10 +178,6 @@ import Checkpoint from "../pages/Checkpoint/index";
 import Websites from "pages/Websites";
 import AddClient from "pages/Clients/AddClient";
 import ClientData from "pages/Clients/ClientData";
-import SubOrg from "pages/Clients/SubOrg";
-import Org from "pages/Clients/Org";
-import AddSubClient from "pages/Clients/AddSubClient";
-import SubClientsData from "pages/Clients/SubClientsData";
 import NewHost from "pages/Websites/NewHosting";
 import Webdetails from "pages/Websites/Webdetails";
 
@@ -341,11 +337,6 @@ const authProtectedRoutes = [
   { path: "/clients", component: <Clients /> },
   {path:"/addclientpage", component:<AddClient/>},
   {path:"/ClientDetail/:id",component:<ClientData/>},
-  {path:"/addsuborg",component:<SubOrg/>},
-  {path:"/org",component:<Org/>},
-  {path:"/addsub-client",component:<AddSubClient/>},
-  {path:"/subclientData",component:<SubClientsData/>},
-
   //OEM
   { path: "/aws", component: <Aws /> },
   { path: "/veritas", component: <Veritas /> },

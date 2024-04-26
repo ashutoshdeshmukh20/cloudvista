@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardBody,
@@ -18,7 +18,6 @@ import TableContainer from "Components/Common/TableContainer";
 import { Link } from "react-router-dom";
 import { APIClient } from "../../helpers/api_helper";
 import Pagination from "Components/Common/Pagination";
-import tableData from "common/data/responsiveTableData";
 import {
   Domain,
   Newrenew,
@@ -50,9 +49,9 @@ const Websites = (props: any) => {
     }
   };
 
-  const handleView = (id: number) => {  
+  const handleView = useCallback((id: number) => {  
     navigate(`/Webdetails/${id}`);
-  };
+  }, [navigate]);
 
   const columns = useMemo(
     () => [
@@ -201,7 +200,7 @@ const Websites = (props: any) => {
         },
       },
     ],
-    []
+    [Data, handleView]
   );
 
   const handleAddNew = () => {

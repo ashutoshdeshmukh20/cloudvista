@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Deploy to Kubernetes on EC2
 
 on:
   push:
@@ -16,22 +16,41 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Build
+      - name: Build React app
         run: yarn build
 
-      - name: SSH into EC2 instance and deploy
-        uses: easingthemes/ssh-deploy@v2
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.EC2_HOST }}
-          REMOTE_USER: ubuntu
-          REMOTE_PORT: ${{ secrets.SERVER_PORT }}
-          SOURCE: build
-          TARGET: /var/www/html/my-react-app/
+      - name: Set up kubectl for Minikube
+        run: echo "${{ secrets.MINIKUBE_CONFIG_DATA }}" | base64 -d > minikube_config.yaml
 
-      - name: Restart Nginx
+      - name: Deploy to Minikube
         run: |
-          ssh_command="sudo service nginx restart"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key.pem
-          chmod 600 ssh_key.pem
-          ssh -i ssh_key.pem ubuntu@${{ secrets.EC2_HOST }} "${ssh_command}"
+          kubectl apply -f deployment.yaml
+
+      - name: Expose service
+        run: |
+          minikube service myapp --url >> minikube_service_url.txt
+          cat minikube_service_url.txt
+
+      - name: Build Docker image
+        run: |
+          docker build -t cloudvista .
+
+      - name: Tag Docker image
+        run: |
+          docker tag cloudvista my-docker-registry/cloudvista:latest
+
+      - name: Push Docker image
+        run: |
+          docker push my-docker-registry/cloudvista:latest
+
+      - name: SSH into EC2 instance
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.INSTANCE_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            kubectl run myapp --image=my-docker-registry/cloudvista:latest --port=80
+            kubectl expose pod myapp --type=LoadBalancer --port=80 --target-port=80
+            minikube service myapp --url >> kubernetes_service_url.txt
+            cat kubernetes_service_url.txt

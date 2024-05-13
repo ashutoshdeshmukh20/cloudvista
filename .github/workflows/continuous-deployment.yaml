@@ -20,13 +20,10 @@ jobs:
         run: yarn build
 
       - name: Set up kubectl for Minikube
-        run: |
-          minikube kubectl -- get pods --namespace=default
+        run: minikube kubectl -- get pods --namespace=default
 
       - name: Get Minikube kubeconfig
-        run: |
-          mkdir -p ~/.kube
-          minikube kubectl -- -n default config view --raw > ~/.kube/config
+        run: minikube kubectl -- get config view --raw > ~/.kube/config
 
       - name: Add Minikube kubeconfig as secret
         uses: actions/upload-artifact@v2
@@ -35,8 +32,7 @@ jobs:
           path: ~/.kube/config
 
       - name: Deploy to Minikube
-        run: |
-          kubectl apply -f deployment.yaml
+        run: kubectl apply -f deployment.yaml
 
       - name: Expose service
         run: |
@@ -44,25 +40,21 @@ jobs:
           cat minikube_service_url.txt
 
       - name: Build Docker image
-        run: |
-          docker build -t cloudvista .
+        run: docker build -t cloudvista .
 
       - name: Tag Docker image
-        run: |
-          docker tag cloudvista my-docker-registry/cloudvista:latest
+        run: docker tag cloudvista my-docker-registry/cloudvista:latest
 
       - name: Push Docker image
-        run: |
-          docker push my-docker-registry/cloudvista:latest
+        run: docker push my-docker-registry/cloudvista:latest
 
-      - name: SSH into EC2 instance
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.INSTANCE_IP }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            kubectl run myapp --image=my-docker-registry/cloudvista:latest --port=80
-            kubectl expose pod myapp --type=LoadBalancer --port=80 --target-port=80
-            minikube service myapp --url >> kubernetes_service_url.txt
-            cat kubernetes_service_url.txt
+      - name: Deploy Docker image to Minikube
+        run: minikube kubectl -- run myapp --image=my-docker-registry/cloudvista:latest --port=80
+
+      - name: Expose service
+        run: minikube kubectl -- expose deployment myapp --type=LoadBalancer --port=80
+
+      - name: Get service URL
+        run: |
+          minikube service myapp --url >> minikube_service_url.txt
+          cat minikube_service_url.txt

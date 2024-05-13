@@ -20,7 +20,14 @@ jobs:
         run: yarn build
 
       - name: Set up kubectl for Minikube
-        run: echo "${{ secrets.MINIKUBE_CONFIG_DATA }}" | base64 -d > minikube_config.yaml
+        run: |
+          minikube kubectl -- get-kubeconfig > minikube_config.yaml
+
+      - name: Add Minikube kubeconfig as secret
+        uses: actions/upload-artifact@v2
+        with:
+          name: minikube_config
+          path: minikube_config.yaml
 
       - name: Deploy to Minikube
         run: |

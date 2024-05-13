@@ -21,13 +21,18 @@ jobs:
 
       - name: Set up kubectl for Minikube
         run: |
-          minikube kubectl -- get-kubeconfig > minikube_config.yaml
+          minikube kubectl -- get pods --namespace=default
+
+      - name: Get Minikube kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          minikube kubectl -- -n default config view --raw > ~/.kube/config
 
       - name: Add Minikube kubeconfig as secret
         uses: actions/upload-artifact@v2
         with:
           name: minikube_config
-          path: minikube_config.yaml
+          path: ~/.kube/config
 
       - name: Deploy to Minikube
         run: |
